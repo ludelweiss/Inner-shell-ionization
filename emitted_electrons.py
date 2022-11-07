@@ -73,23 +73,32 @@ electrons(24, 12, 3)    # Cr XII
 """
 
 def all_electrons() :
-    Z_all = []
+    electrons_nb = []
+    Z_elec = []
     for z in range(4,30) :
         Z_idx = np.where(table[:, 0] == z)
         Z_idx = Z_idx[0]
-        average = np.average(table[Z_idx[0], 6:])
-        Z_all = np.append(Z_all, average)
+        
+        avg_all = table[Z_idx[0], 6:]
+        average =  []
+        
+        for i in range(len(avg_all)) :
+            average = np.append(average, avg_all[i]*(i+1))
+            print("a", average)
+        Z_elec = np.append(Z_elec, average)
+
+        electrons_nb = np.append(electrons_nb, Z_elec)/10000
+    electrons_nb = np.reshape(electrons_nb, (26, 10))
     
     x = np.arange(5,31)
-    plt.plot(x, Z_all , drawstyle = 'steps')
+    plt.plot(x, electrons_nb , drawstyle = 'steps')
     plt.title("Average number of electrons emitted during the decay of a K-shell vacancy")
     plt.legend()
     plt.xlabel("Atomic number")
     plt.ylabel("Number of electrons")
-    return(Z_all)
+    return(electrons_nb)
 
 A = all_electrons()
-
 
 
 
