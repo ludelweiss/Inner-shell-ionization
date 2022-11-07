@@ -32,28 +32,44 @@ def correspondence(Z, st, s):
     return elements[Z-1], stages[st-1], gaps[s-1]
 
 
-def graph(Z, st, s):
+def electrons(Z, st, s):
     # extracting the right Z and ionisation stage indexes from the data
     Z_idx = np.where(table[:, 0] == Z)
     Z_idx = Z_idx[0]
     
-    st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1], 1] == st)     
+    if len(Z_idx) > 1 :
+        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1], 1] == st)
+        
+    elif (len(Z_idx) == 1):
+        st_idx = np.where(table[Z_idx[0], 1] == st)
+        
     st_idx = st_idx[0]
     
     # turning Z, st and s into their corresponding names (for a more detailled graph)
     element, stage, gap =  correspondence(Z, st, s)
     
     # plotting the graph
+    plt.figure()
     x= np.arange(1,11)  # number of electrons
+
+    if ((len(st_idx) != 0) and (len(st_idx) != 1)) :
+        y_global = table[Z_idx[0]+st_idx[0]:Z_idx[0]+st_idx[0]+(len(st_idx)-1), 6:16]/10000 # probability for each vacancy position
+
+        y = y_global[s-1]   # probability for a specific vacancy
     
-    y_global = table[Z_idx[0]:Z_idx[0]+(len(st_idx)-1), 6:16]/10000 # probability for each vacancy position
-    y = y_global[s-1]   # probability for a specific vacancy
+    elif (len(st_idx) == 1):
+        y_global = table[Z_idx[0]+st_idx[0], 6:16]/10000 # probability for each vacancy position
+
+        y = y_global
+    
     
     plt.plot(x, y , drawstyle = 'steps', label = element + " " + stage)
-    plt.title(gap + "-shell ionisation of " + element + " " + stage)
+    plt.title(gap + "-shell ionisation of " + element + " " + stage + " (Z = " + str(Z) + ")")
     plt.legend()
     plt.xlabel("Number of emitted electrons")
     plt.ylabel("Probability")
-    #plt.savefig('graph.png')
+
+    plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
     
-graph(26, 1, 1)   # example with Fe I
+#electrons(26, 1, 1)   # example with Fe I
+electrons(24, 12, 3)
