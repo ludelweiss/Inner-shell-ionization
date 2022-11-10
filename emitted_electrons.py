@@ -72,33 +72,40 @@ electrons(26, 1, 1)   # Fe I
 electrons(24, 12, 3)    # Cr XII
 """
 
-def all_electrons() :
+def all_electrons(s) :  # the only variable is the intial shell vacany
     electrons_nb = []
     Z_elec = []
-    for z in range(4,30) :
+    for z in range(4,30) :  # iterating for each atom (Z 4_30)
         Z_idx = np.where(table[:, 0] == z)
         Z_idx = Z_idx[0]
         
-        avg_all = table[Z_idx[0], 6:]
-        average =  []
+        avg_all = table[Z_idx[0] + s-1, 6:16]
+        print((avg_all))
         
+        #average =  []
+        cpt = 0
         for i in range(len(avg_all)) :
-            average = np.append(average, avg_all[i]*(i+1))
-            print("a", average)
-        Z_elec = np.append(Z_elec, average)
+            cpt += avg_all[i]*(i+1)
+            #average = np.append(average, avg_all[i]*(i+1))
 
-        electrons_nb = np.append(electrons_nb, Z_elec)/10000
-    electrons_nb = np.reshape(electrons_nb, (26, 10))
+        Z_elec = np.append(Z_elec, cpt)
+
+    electrons_nb = np.append(electrons_nb, Z_elec)/10000
+    #,electrons_nb = np.reshape(electrons_nb, (26, 10))
+    
+    gap = correspondence(s, s, s)[2]  # the values for Z and st in the function are irrelevant
     
     x = np.arange(5,31)
-    plt.plot(x, electrons_nb , drawstyle = 'steps')
-    plt.title("Average number of electrons emitted during the decay of a K-shell vacancy")
+    plt.plot(x, electrons_nb , drawstyle = 'steps', label = gap + "-shell")
+    plt.title("Average number of electrons emitted during the decay of a inner-shell vacancy")
     plt.legend()
     plt.xlabel("Atomic number")
     plt.ylabel("Number of electrons")
-    return(electrons_nb)
+    #return(electrons_nb)
 
-A = all_electrons()
+all_electrons(1)
+all_electrons(5)
+all_electrons(16)
 
 
 
