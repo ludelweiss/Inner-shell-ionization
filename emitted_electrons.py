@@ -72,40 +72,55 @@ electrons(26, 1, 1)   # Fe I
 electrons(24, 12, 3)    # Cr XII
 """
 
-def all_electrons(s) :  # the only variable is the intial shell vacany
+def all_electrons(S) :  # the only variable is the intial shell vacancy. Three choices : K (1), L_1 (2) or M_1 (3)
+    
     electrons_nb = []
     Z_elec = []
     for z in range(4,30) :  # iterating for each atom (Z 4_30)
         Z_idx = np.where(table[:, 0] == z)
         Z_idx = Z_idx[0]
         
-        avg_all = table[Z_idx[0] + s-1, 6:16]
-        print((avg_all))
+        average = 0
+        if S == 1 :
+            gap = "K"
+            for s in range(1,5) :
+                avg_all = table[Z_idx[0] + s-1, 6:16]
         
-        #average =  []
-        cpt = 0
-        for i in range(len(avg_all)) :
-            cpt += avg_all[i]*(i+1)
-            #average = np.append(average, avg_all[i]*(i+1))
+            for i in range(len(avg_all)) :
+                average += avg_all[i]*(i+1)
 
-        Z_elec = np.append(Z_elec, cpt)
+        elif S == 2 :
+            gap = "L_1"
+            for s in range(5,9) :
+                avg_all = table[Z_idx[0] + s-1, 6:16]
+        
+            for i in range(len(avg_all)) :
+                average += avg_all[i]*(i+1)
 
+        elif S == 3 :
+            gap = "M_1"
+            for s in range(16,18) :
+                avg_all = table[Z_idx[0] + s-1, 6:16]
+        
+            for i in range(len(avg_all)) :
+                average += avg_all[i]*(i+1)
+                
+        else :
+            return("The intial chosen vacancy is incorrect.")
+
+        Z_elec = np.append(Z_elec, average)
     electrons_nb = np.append(electrons_nb, Z_elec)/10000
-    #,electrons_nb = np.reshape(electrons_nb, (26, 10))
-    
-    gap = correspondence(s, s, s)[2]  # the values for Z and st in the function are irrelevant
     
     x = np.arange(5,31)
     plt.plot(x, electrons_nb , drawstyle = 'steps', label = gap + "-shell")
-    plt.title("Average number of electrons emitted during the decay of a inner-shell vacancy")
+    plt.title("Average number of electrons emitted during the decay of an inner-shell vacancy")
     plt.legend()
     plt.xlabel("Atomic number")
     plt.ylabel("Number of electrons")
     #return(electrons_nb)
 
-all_electrons(1)
-all_electrons(5)
-all_electrons(16)
+
+all_electrons(1), all_electrons(2), all_electrons(3)
 
 
 
