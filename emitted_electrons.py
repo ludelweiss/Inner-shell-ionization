@@ -76,38 +76,37 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     
     electrons_nb = []
     Z_elec = []
-    for z in range(4,30) :  # iterating for each atom (Z 4_30)
+    for z in range(4,30) :  # iterating for each atom (Z: 4-30)
         Z_idx = np.where(table[:, 0] == z)
         Z_idx = Z_idx[0]
         
         average = 0
-        if S == 1 :
+        avg_all = []
+
+        if S == 1 :     # case for a K-shell vacancy
             gap = "K"
-            for s in range(1,5) :
-                avg_all = table[Z_idx[0] + s-1, 6:16]
-        
+            avg_all = table[Z_idx[0] + S-1, 6:]
             for i in range(len(avg_all)) :
                 average += avg_all[i]*(i+1)
 
-        elif S == 2 :
+        elif S == 2 :   # L_1 vacancy
             gap = "L_1"
-            for s in range(5,9) :
-                avg_all = table[Z_idx[0] + s-1, 6:16]
-        
+            if table[Z_idx[0] + S-1, 1] == 1 and table[Z_idx[0] + S-1, 0] == z: # to make sure the right ionisation stage exists for this atom
+                avg_all = table[Z_idx[0] + S-1, 6:]
+            for i in range(len(avg_all)):
+                average += avg_all[i]*(i+1)
+
+        elif S == 3 :   # M_1 vacancy
+            gap = "M_1"
+            if table[Z_idx[0] + S-1, 1] == 1 and table[Z_idx[0] + S-1, 0] == z:
+                avg_all = table[Z_idx[0] + S-1, 6:]
             for i in range(len(avg_all)) :
                 average += avg_all[i]*(i+1)
 
-        elif S == 3 :
-            gap = "M_1"
-            for s in range(16,18) :
-                avg_all = table[Z_idx[0] + s-1, 6:16]
-        
-            for i in range(len(avg_all)) :
-                average += avg_all[i]*(i+1)
-                
         else :
             return("The intial chosen vacancy is incorrect.")
 
+        
         Z_elec = np.append(Z_elec, average)
     electrons_nb = np.append(electrons_nb, Z_elec)/10000
     
@@ -117,12 +116,10 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     plt.legend()
     plt.xlabel("Atomic number")
     plt.ylabel("Number of electrons")
-    #return(electrons_nb)
+    return(electrons_nb)
 
 
-all_electrons(1), all_electrons(2), all_electrons(3)
-
-
+all_electrons(1), all_electrons(2), all_electrons(3)    # graphs for the K, L_1 and M_1 hell vacancies
 
 
 
