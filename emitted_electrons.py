@@ -13,9 +13,11 @@ The function all_electrons() plots the average number of emitted electrons in fu
 Table 2 from:
 https://ui.adsabs.harvard.edu/abs/1993A%26AS...97..443K/abstract
 
-Z : atomic number
-st : ionisation stage
-s : shell with the initial vacancy
+Z: atomic number
+st: ionisation stage
+s: shell with the initial vacancy
+il: type of inner-shell ionisation
+w: fluorescence yield
 """
 
 import numpy as np
@@ -25,6 +27,7 @@ table = np.loadtxt("table2")   # importing the data
 elements = np.loadtxt("elements_names", dtype = str)    # importing the names of Z, st and s (used in the legend of the graphs)
 stages = np.loadtxt("ionisation_stages", dtype = str)
 gaps = np.loadtxt("initial_gap", dtype = str)
+fluo_tab = np.loadtxt("table3")
 
 
 def correspondence(Z, st, s):   # used to give the details of each ionisation in the graph legend/ title
@@ -64,8 +67,9 @@ def electrons(Z, st, s):
     plt.ylabel("Probability")
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
 
+
+# examples : Fe I with K-shell vacancy and Cr XII with L_2-shell vacancy
 """
-# examples : Fe I and Cr XII
 electrons(26, 1, 1)   # Fe I
 electrons(24, 12, 3)    # Cr XII
 """
@@ -99,8 +103,40 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     plt.savefig("nb_of_electrons_" + gap + "-shell.png")
     return(electrons_nb)
 
+# graphs for the K, L_1 and M_1 shell vacancies
+#all_electrons(1), all_electrons(2), all_electrons(5)
 
-all_electrons(1), all_electrons(2), all_electrons(5)    # graphs for the K, L_1 and M_1 shell vacancies
+def fluo_yield(Z, il):
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    """
+    if len(Z_idx) > 1 :
+        il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il)
+    elif (len(Z_idx) == 1):
+        il_idx = np.where(fluo_tab[Z_idx[0], 4] == il)    
+    il_idx = il_idx[0]
+    """ 
+    w_tab = []
+    for st in range(26):
+
+        if len(Z_idx) > 1 :
+            il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il)
+        elif (len(Z_idx) == 1):
+            il_idx = np.where(fluo_tab[Z_idx[0], 4] == il)    
+        il_idx = il_idx[0]
+        print(il_idx)
+      
+        for i in range(len(il_idx)):
+            if fluo_tab[Z_idx[0] + il_idx[i], 1] == st+1 and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
+                w_tab = np.append(w_tab, fluo_tab[Z_idx[0]+st, 4])
+                print("if")
+            
+    return w_tab
+
+
+W = fluo_yield(26, 1)
+
+
 
 
 
