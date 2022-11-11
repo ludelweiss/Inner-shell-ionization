@@ -67,11 +67,11 @@ def electrons(Z, st, s):
 
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
     
-
+"""
 # examples : Fe I and Cr XII :
 electrons(26, 1, 1)   # Fe I
 electrons(24, 12, 3)    # Cr XII
-
+"""
 
 def all_electrons(S) :  # the only variable is the intial shell vacancy. Three choices : K (1), L_1 (2) or M_1 (3)
     
@@ -85,30 +85,11 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
         avg_all = []
 
 
-
-        if S == 1 :     # case for a K-shell vacancy
-            gap = "K"
-            avg_all = table[Z_idx[0] + S-1, 6:]
+        gap = correspondence(0, 0, S)[2]    # the only relevant data is the gap type
+        avg_all = table[Z_idx[0] + S-1, 6:]
+        if table[Z_idx[0] + S-1, 1] == 1 and table[Z_idx[0] + S-1, 0] == z: # to make sure the right ionisation stage exists for this atom
             for i in range(len(avg_all)) :
                 average += avg_all[i]*(i+1)
-
-        elif S == 2 :   # L_1 vacancy
-            gap = "L_1"
-            if table[Z_idx[0] + S-1, 1] == 1 and table[Z_idx[0] + S-1, 0] == z: # to make sure the right ionisation stage exists for this atom
-                avg_all = table[Z_idx[0] + S-1, 6:]
-            for i in range(len(avg_all)):
-                average += avg_all[i]*(i+1)
-
-        elif S == 3 :   # M_1 vacancy
-            gap = "M_1"
-            if table[Z_idx[0] + S-1, 1] == 1 and table[Z_idx[0] + S-1, 0] == z:
-                avg_all = table[Z_idx[0] + S-1, 6:]
-            for i in range(len(avg_all)) :
-                average += avg_all[i]*(i+1)
-
-        else :
-            return("The intial chosen vacancy is incorrect.")
-
         
         Z_elec = np.append(Z_elec, average)
     electrons_nb = np.append(electrons_nb, Z_elec)/10000
@@ -122,7 +103,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     return(electrons_nb)
 
 
-#all_electrons(1), all_electrons(2), all_electrons(3)    # graphs for the K, L_1 and M_1 hell vacancies
+all_electrons(1), all_electrons(2), all_electrons(3)    # graphs for the K, L_1 and M_1 shell vacancies
 
 
 
