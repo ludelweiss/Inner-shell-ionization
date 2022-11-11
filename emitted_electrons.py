@@ -66,11 +66,12 @@ def electrons(Z, st, s):
     plt.ylabel("Probability")
 
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
-"""
+    
+
 # examples : Fe I and Cr XII :
 electrons(26, 1, 1)   # Fe I
 electrons(24, 12, 3)    # Cr XII
-"""
+
 
 def all_electrons(S) :  # the only variable is the intial shell vacancy. Three choices : K (1), L_1 (2) or M_1 (3)
     
@@ -82,6 +83,8 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
         
         average = 0
         avg_all = []
+
+
 
         if S == 1 :     # case for a K-shell vacancy
             gap = "K"
@@ -119,7 +122,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     return(electrons_nb)
 
 
-all_electrons(1), all_electrons(2), all_electrons(3)    # graphs for the K, L_1 and M_1 hell vacancies
+#all_electrons(1), all_electrons(2), all_electrons(3)    # graphs for the K, L_1 and M_1 hell vacancies
 
 
 
