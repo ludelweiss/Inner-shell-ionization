@@ -113,11 +113,11 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
     w = np.zeros(26)    # base array for the fluorescence yield for each ionisation stage
     if type(il) == int:
         il = [il]
-        il_name = ""
+    il_name = ""
     
     for I in range(len(il)) :
-        il_name += str(correspondence(0, 0, 0, il[I])[3])
-        
+        il_name = " ".join([il_name, correspondence(0, 0, 0, il[I])[3]])
+            
         
         if len(Z_idx) > 1 :
             il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il[I])
@@ -139,9 +139,10 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
     plt.legend()
     plt.xlabel("ionistion stage")
     plt.ylabel("fluorescence yield")
-    #plt.savefig("fluorescence_yield.png")
+    plt.savefig("fluorescence_yield" + il_name + ".png")
 
-fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))  # K alpha and K beta fluorescence for all ions of iron
+# K alpha and K beta fluorescence for all ions of iron:
+#fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
 
 
 
