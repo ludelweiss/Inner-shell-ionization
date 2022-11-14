@@ -27,11 +27,12 @@ table = np.loadtxt("table2")   # importing the data
 elements = np.loadtxt("elements_names", dtype = str)    # importing the names of Z, st and s (used in the legend of the graphs)
 stages = np.loadtxt("ionisation_stages", dtype = str)
 gaps = np.loadtxt("initial_gap", dtype = str)
+ils = np.loadtxt("il", dtype = str)
 fluo_tab = np.loadtxt("table3")
 
 
-def correspondence(Z, st, s):   # used to give the details of each ionisation in the graph legend/ title
-    return elements[Z-1], stages[st-1], gaps[s-1]
+def correspondence(Z, st, s, il):   # used to give the details of each ionisation in the graph legend/ title
+    return elements[Z-1], stages[st-1], gaps[s-1], ils[il-1]
 
 
 def electrons(Z, st, s):
@@ -46,7 +47,7 @@ def electrons(Z, st, s):
     st_idx = st_idx[0]  # before that, st_idx is a tuple of a single array
     
     # turning Z, st and s into their corresponding names (for a more detailled graph)
-    element, stage, gap =  correspondence(Z, st, s)
+    element, stage, gap, il =  correspondence(Z, st, s, 0)
     
     # plotting the graph
     plt.figure()
@@ -93,7 +94,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     
 
     # Plotting the graph
-    gap = correspondence(0, 0, S)[2]    # the only relevant data is the gap type
+    gap = correspondence(0, 0, S, 0)[2]    # the only relevant data is the gap type
     x = np.arange(5,31)
     plt.plot(x, electrons_nb , drawstyle = 'steps', label = gap + "-shell vacancy")
     plt.title("Average number of electrons emitted during the decay of an inner-shell vacancy")
@@ -106,36 +107,41 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
 # graphs for the K, L_1 and M_1 shell vacancies:
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
-def fluo_yield(Z, il):
+def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     Z_idx = np.where(fluo_tab[:, 0] == Z)
     Z_idx = Z_idx[0]
+    w = np.zeros(26)    # base array for the fluorescence yield for each ionisation stage
+    if type(il) == int:
+        il = [il]
+        il_name = ""
     
     for I in range(len(il)) :
+        il_name += str(correspondence(0, 0, 0, il[I])[3])
+        
+        
         if len(Z_idx) > 1 :
             il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il[I])
         elif (len(Z_idx) == 1):
             il_idx = np.where(fluo_tab[Z_idx[0], 4] == il[I])    
         il_idx = il_idx[0]
         
-        w = []  # fluorescence yield
-        for st in range(26):
+        for st in range(26):    # iteration for each ionisation stage
             for i in range(len(il_idx)):
                 if fluo_tab[Z_idx[0] + il_idx[i], 1] == st+1 and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
-                    w = np.append(w, fluo_tab[Z_idx[0]+il_idx[i], 6])
-        
+                    w[st] += fluo_tab[Z_idx[0]+il_idx[i], 6]
+                    
     # graph
-    element= correspondence(Z, 0, 0)[0]
-    x = np.linspace(0, 26, num=len(w))
-    plt.plot(x, w , drawstyle = 'steps', label = "il")
-    plt.title("Fluorescende yield for all ions of " + element)
-    plt.legend()
-    plt.xlabel("stage")
-    plt.ylabel("fluorescence yield")
+    element= correspondence(Z, 0, 0, 0)[0]
     
-    return w
+    x = np.arange(1, 27)
+    plt.plot(x, w, drawstyle = 'steps', label = il_name)
+    plt.title("Fluorescence yield for all ions of " + element)
+    plt.legend()
+    plt.xlabel("ionistion stage")
+    plt.ylabel("fluorescence yield")
+    #plt.savefig("fluorescence_yield.png")
 
-
-W = fluo_yield(26, [1, 2])
+fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))  # K alpha and K beta fluorescence for all ions of iron
 
 
 
