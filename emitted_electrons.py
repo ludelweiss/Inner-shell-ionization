@@ -103,38 +103,39 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     plt.savefig("nb_of_electrons_" + gap + "-shell.png")
     return(electrons_nb)
 
-# graphs for the K, L_1 and M_1 shell vacancies
+# graphs for the K, L_1 and M_1 shell vacancies:
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
 def fluo_yield(Z, il):
-    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = np.where(fluo_tab[:, 0] == Z)
     Z_idx = Z_idx[0]
-    """
-    if len(Z_idx) > 1 :
-        il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il)
-    elif (len(Z_idx) == 1):
-        il_idx = np.where(fluo_tab[Z_idx[0], 4] == il)    
-    il_idx = il_idx[0]
-    """ 
-    w_tab = []
-    for st in range(26):
-
+    
+    for I in range(len(il)) :
         if len(Z_idx) > 1 :
-            il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il)
+            il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il[I])
         elif (len(Z_idx) == 1):
-            il_idx = np.where(fluo_tab[Z_idx[0], 4] == il)    
+            il_idx = np.where(fluo_tab[Z_idx[0], 4] == il[I])    
         il_idx = il_idx[0]
-        print(il_idx)
-      
-        for i in range(len(il_idx)):
-            if fluo_tab[Z_idx[0] + il_idx[i], 1] == st+1 and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
-                w_tab = np.append(w_tab, fluo_tab[Z_idx[0]+st, 4])
-                print("if")
-            
-    return w_tab
+        
+        w = []  # fluorescence yield
+        for st in range(26):
+            for i in range(len(il_idx)):
+                if fluo_tab[Z_idx[0] + il_idx[i], 1] == st+1 and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
+                    w = np.append(w, fluo_tab[Z_idx[0]+il_idx[i], 6])
+        
+    # graph
+    element= correspondence(Z, 0, 0)[0]
+    x = np.linspace(0, 26, num=len(w))
+    plt.plot(x, w , drawstyle = 'steps', label = "il")
+    plt.title("Fluorescende yield for all ions of " + element)
+    plt.legend()
+    plt.xlabel("stage")
+    plt.ylabel("fluorescence yield")
+    
+    return w
 
 
-W = fluo_yield(26, 1)
+W = fluo_yield(26, [1, 2])
 
 
 
