@@ -8,7 +8,8 @@ Created on Sat Nov  5 17:54:15 2022
 Modelling of the average number of electrons emitted during an inner-shell ionisation of an element (Z = 4-30).
 
 The function electrons(Z, st, s) plots the graph of the probability distribution of the number of electrons emitted for a given element, ionisation stage and initial vacany position.
-The function all_electrons() plots the average number of emitted electrons in function of the atomic number for different shell vacancy.
+The function all_electrons(S) plots the average number of emitted electrons in function of the atomic number for different shell vacancy.
+The function fluo_yield(Z, il) plots a given fluorescence yield for all ions of an element.
 
 Table 2 from:
 https://ui.adsabs.harvard.edu/abs/1993A%26AS...97..443K/abstract
@@ -41,29 +42,31 @@ def electrons(Z, st, s):
     Z_idx = Z_idx[0]
     
     if len(Z_idx) > 1 :
-        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1], 1] == st)
+        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
     elif (len(Z_idx) == 1):
-        st_idx = np.where(table[Z_idx[0], 1] == st)    
+        st_idx = np.where(table[Z_idx[0], 1] == st)
+        
     st_idx = st_idx[0]  # before that, st_idx is a tuple of a single array
     
     element, stage, gap, il =  correspondence(Z, st, s, 0)  # turning Z, st and s into their corresponding names (for a more detailled graph)
     
+    if ((len(st_idx) != 0) and (len(st_idx) != 1)) :
+        proba_global = table[Z_idx[0]+st_idx[0]:Z_idx[0]+st_idx[0]+(len(st_idx)-1), 6:16]/10000 # probability for each vacancy position
+        proba = proba_global[s-1]   # probability for a specific vacancy
+    elif (len(st_idx) == 1):
+        proba_global = table[Z_idx[0]+st_idx[0], 6:16]/10000 # probability for each vacancy position
+        proba = proba_global   # there is only one vacancy possible
+    
     # plotting the graph
     x= np.arange(1,11)  # number of electrons
-
-    if ((len(st_idx) != 0) and (len(st_idx) != 1)) :
-        y_global = table[Z_idx[0]+st_idx[0]:Z_idx[0]+st_idx[0]+(len(st_idx)-1), 6:16]/10000 # probability for each vacancy position
-        y = y_global[s-1]   # probability for a specific vacancy
-    elif (len(st_idx) == 1):
-        y_global = table[Z_idx[0]+st_idx[0], 6:16]/10000 # probability for each vacancy position
-        y = y_global   # there is only one vacancy possible
-    
-    plt.plot(x, y , drawstyle = 'steps', label = element + " " + stage)
+    plt.figure()
+    plt.plot(x, proba , drawstyle = 'steps', label = element + " " + stage)
     plt.title(gap + "-shell ionisation of " + element + " " + stage + " (Z = " + str(Z) + ")")
     plt.legend()
     plt.xlabel("Number of emitted electrons")
     plt.ylabel("Probability")
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
+    return(proba)
 
 
 def all_electrons(S) :  # the only variable is the intial shell vacancy. Three choices : K (1), L_1 (2) or M_1 (3)
@@ -83,6 +86,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     electrons_nb = np.append(electrons_nb, Z_elec)/10000    # divided by 10000
 
     # Plotting the graph
+    plt.figure()
     gap = correspondence(0, 0, S, 0)[2]    # the only relevant data is the gap type
     x = np.arange(5,31)
     plt.plot(x, electrons_nb , drawstyle = 'steps', label = gap + "-shell vacancy")
@@ -120,26 +124,28 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
                     else :
                         w[st] += fluo_tab[Z_idx[0]+il_idx[i], 6]      
     # graph
+    plt.figure()
     element= correspondence(Z, 0, 0, 0)[0]
     x = np.arange(1, 27)
     plt.plot(x, w, drawstyle = 'steps', label = il_name)
     plt.title("Fluorescence yield for all ions of " + element)
     plt.legend()
-    plt.xlabel("ionistion stage")
+    plt.xlabel("ionisation stage")
     plt.ylabel("fluorescence yield")
     plt.savefig("fluorescence_yield" + il_name + ".png")
+    return(w)
 
 
 """
 Applications of the functions
 """
 
-#electrons(26, 1, 1)   # Fe I with K-shell vacancy
+electrons(26, 1, 1)   # Fe I with K-shell vacancy
 # all oxygen graphs:
-#electrons(8, 1, 1), electrons(8, 2, 1), electrons(8, 3, 1), electrons(8, 4, 1), electrons(8, 5, 1)
+E = electrons(8, 1, 1), electrons(8, 2, 1), electrons(8, 3, 1), electrons(8, 4, 1), electrons(8, 5, 1)
 
 # graphs for the K, L_1 and M_1 shell vacancies:
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
 # K alpha and K beta fluorescence for all ions of iron:
-fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+#fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
