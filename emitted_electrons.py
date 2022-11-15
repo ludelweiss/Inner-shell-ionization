@@ -97,10 +97,11 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
 def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     Z_idx = np.where(fluo_tab[:, 0] == Z)
     Z_idx = Z_idx[0]
-    w = np.zeros(26)    # base array for the fluorescence yield for each ionisation stage
+    w = np.empty(26)    # base array for the fluorescence yield for each ionisation stage
+    w.fill(np.NaN)
     if type(il) == int:
         il = [il]
-    il_name = ""# for the graph legend
+    il_name = ""  # for the graph legend
     
     for I in range(len(il)) :
         il_name = " ".join([il_name, correspondence(0, 0, 0, il[I])[3]])    # for the graph legend
@@ -114,7 +115,10 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
         for st in range(26):    # iteration for each ionisation stage
             for i in range(len(il_idx)):
                 if fluo_tab[Z_idx[0] + il_idx[i], 1] == st+1 and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
-                    w[st] += fluo_tab[Z_idx[0]+il_idx[i], 6]      
+                    if np.isnan(w[st]) :
+                        w[st] = fluo_tab[Z_idx[0]+il_idx[i], 6]
+                    else :
+                        w[st] += fluo_tab[Z_idx[0]+il_idx[i], 6]      
     # graph
     element= correspondence(Z, 0, 0, 0)[0]
     x = np.arange(1, 27)
@@ -138,4 +142,4 @@ Applications of the functions
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
 # K alpha and K beta fluorescence for all ions of iron:
-#fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
