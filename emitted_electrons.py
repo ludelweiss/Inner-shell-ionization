@@ -183,7 +183,7 @@ def energy(Z, s):
     plt.ylabel("energy (eV)")
     plt.savefig("energy_"+element+"_"+gap+"-shell.png")
     return(energy_I, energy_E)
-    
+
 
 """
 Applications of the functions
