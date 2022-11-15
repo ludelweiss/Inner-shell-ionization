@@ -57,15 +57,17 @@ def electrons(Z, st, s):
         proba_global = table[Z_idx[0]+st_idx[0], 6:16]/10000 # probability for each vacancy position
         proba = proba_global   # there is only one vacancy possible
     
-    # plotting the graph
-    x= np.arange(1,11)  # number of electrons
+
+    # Plotting the graph
     plt.figure()
+    x= np.arange(1,11)  # number of electrons
     plt.plot(x, proba , drawstyle = 'steps', label = element + " " + stage)
     plt.title(gap + "-shell ionisation of " + element + " " + stage + " (Z = " + str(Z) + ")")
     plt.legend()
     plt.xlabel("Number of emitted electrons")
     plt.ylabel("Probability")
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
+    
     return(proba)
 
 
@@ -135,17 +137,58 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
     plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
+def energy(Z, s):
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    
+    if len(Z_idx) > 1 :
+        s_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 2] == s)
+    elif (len(Z_idx) == 1):
+        s_idx = np.where(table[Z_idx[0], 2] == s)
+    s_idx = s_idx[0]
+    
+    energy_I = np.empty(26)
+    energy_I.fill(np.NaN)
+    energy_E = np.empty(26)
+    energy_E.fill(np.NaN)
+    
+    for st in range(26):
+        if table[Z_idx[0]+st, 2] == s and table[Z_idx[0]+st, 0] == Z:
+            if np.isnan(energy_I[st]):
+                energy_I[st] = table[Z_idx[0]+st, 3]
+            else:
+                energy_I[st] += table[Z_idx[0]+st, 3]
+            if np.isnan(energy_E[st]):
+                energy_E[st] = table[Z_idx[0]+st, 4]
+            else:
+                energy_E[st] += table[Z_idx[0]+st, 4]
+    # graph
+    plt.figure()
+    element= correspondence(Z, 0, 0, 0)[0]
+    x = np.arange(1, 27)
+    plt.plot(x, energy_I, drawstyle = 'steps', label = "Ionisation energy")
+    plt.plot(x, energy_E, drawstyle = 'steps', label = "Average Auger electron energy")
+    plt.title("Energy for " + element)
+    plt.legend()
+    plt.xlabel("ionisation stage")
+    plt.ylabel("energy (eV)")
+    
+    return(energy_I, energy_E)
+    
 
 """
 Applications of the functions
 """
 
-electrons(26, 1, 1)   # Fe I with K-shell vacancy
+#electrons(26, 1, 1)   # Fe I with K-shell vacancy
 # all oxygen graphs:
-E = electrons(8, 1, 1), electrons(8, 2, 1), electrons(8, 3, 1), electrons(8, 4, 1), electrons(8, 5, 1)
+#electrons(8, 1, 1), electrons(8, 2, 1), electrons(8, 3, 1), electrons(8, 4, 1), electrons(8, 5, 1)
 
 # graphs for the K, L_1 and M_1 shell vacancies:
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
 # K alpha and K beta fluorescence for all ions of iron:
-#fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+
+# Oxygen ions energy:
+#E = energy(12, 1)
