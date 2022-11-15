@@ -143,28 +143,37 @@ def energy(Z, s):
     
     if len(Z_idx) > 1 :
         s_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 2] == s)
+
     elif (len(Z_idx) == 1):
         s_idx = np.where(table[Z_idx[0], 2] == s)
     s_idx = s_idx[0]
     
-    energy_I = np.empty(26)
+    energy_I = np.empty(26) # base tables for the energies
     energy_I.fill(np.NaN)
     energy_E = np.empty(26)
     energy_E.fill(np.NaN)
     
     for st in range(26):
-        if table[Z_idx[0]+st, 2] == s and table[Z_idx[0]+st, 0] == Z:
-            if np.isnan(energy_I[st]):
-                energy_I[st] = table[Z_idx[0]+st, 3]
-            else:
-                energy_I[st] += table[Z_idx[0]+st, 3]
-            if np.isnan(energy_E[st]):
-                energy_E[st] = table[Z_idx[0]+st, 4]
-            else:
-                energy_E[st] += table[Z_idx[0]+st, 4]
+        if len(Z_idx) > 1 :
+            st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st+1)
+        elif (len(Z_idx) == 1):
+            st_idx = np.where(table[Z_idx[0], 1] == st+1)
+        st_idx = st_idx[0]
+        
+        for ST in range(len(st_idx)):
+            if table[Z_idx[0]+st_idx[ST], 2] == s and table[Z_idx[0]+st_idx[ST], 0] == Z:
+                if np.isnan(energy_I[st]):
+                    energy_I[st] = table[Z_idx[0]+st_idx[ST], 3]
+                else:
+                    energy_I[st] += table[Z_idx[0]+st_idx[ST], 3]
+                if np.isnan(energy_E[st]):
+                    energy_E[st] = table[Z_idx[0]+st_idx[ST], 4]
+                else:
+                    energy_E[st] += table[Z_idx[0]+st_idx[ST], 4]
     # graph
     plt.figure()
-    element= correspondence(Z, 0, 0, 0)[0]
+    element= correspondence(Z, 0, s, 0)[0]
+    gap = correspondence(Z, 0, s, 0)[2]
     x = np.arange(1, 27)
     plt.plot(x, energy_I, drawstyle = 'steps', label = "Ionisation energy")
     plt.plot(x, energy_E, drawstyle = 'steps', label = "Average Auger electron energy")
@@ -172,7 +181,7 @@ def energy(Z, s):
     plt.legend()
     plt.xlabel("ionisation stage")
     plt.ylabel("energy (eV)")
-    
+    plt.savefig("energy_"+element+"_"+gap+"-shell.png")
     return(energy_I, energy_E)
     
 
@@ -188,7 +197,7 @@ Applications of the functions
 #all_electrons(1), all_electrons(2), all_electrons(5)
 
 # K alpha and K beta fluorescence for all ions of iron:
-fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+#fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
 
 # Oxygen ions energy:
-#E = energy(12, 1)
+energy(8, 1)
