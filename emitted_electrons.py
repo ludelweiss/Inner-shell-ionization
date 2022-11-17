@@ -11,7 +11,7 @@ The function electrons(Z, st, s) plots the graph of the probability distribution
 The function all_electrons(S) plots the average number of emitted electrons in function of the atomic number for different shell vacancy.
 The function fluo_yield(Z, il) plots a given fluorescence yield for all ions of an element.
 
-Table 2 from:
+Tables 2 and 3 from:
 https://ui.adsabs.harvard.edu/abs/1993A%26AS...97..443K/abstract
 
 Z: atomic number
@@ -177,12 +177,58 @@ def energy(Z, s):
     x = np.arange(1, 27)
     plt.plot(x, energy_I, drawstyle = 'steps', label = "Ionisation energy")
     plt.plot(x, energy_E, drawstyle = 'steps', label = "Average Auger electron energy")
-    plt.title("Energy for " + element)
+    #plt.plot(x, energy_E + energy_I, drawstyle = 'steps', label = "Total")
+    plt.title("Energy for " + element+" ("+gap+"-shell vacancy)")
     plt.legend()
     plt.xlabel("ionisation stage")
     plt.ylabel("energy (eV)")
-    plt.savefig("energy_"+element+"_"+gap+"-shell.png")
-    return(energy_I, energy_E)
+    #plt.savefig("energy_"+element+"_"+gap+"-shell.png")
+    return(energy_I, energy_E, energy_I + energy_E)
+
+
+
+def energy_st(Z, s):
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    
+    if len(Z_idx) > 1 :
+        s_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 2] == s)
+    elif (len(Z_idx) == 1):
+        s_idx = np.where(table[Z_idx[0], 2] == s)
+    s_idx = s_idx[0]
+        
+    energy = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 4]
+    
+    Z_energy = []
+    e_nb = []
+    average = 0 # average number of electrons for a given Z and initial vacancy
+    #for i in range()
+    proba = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 6:]/10000 # probability to get X electrons
+    
+    if table[Z_idx[0] + s_idx[0], 1] == s and table[Z_idx[0] + s_idx[0], 0] == Z:
+        for c in range(len(proba)):
+            for i in range(len(proba[0,:])) :
+                print(average)
+                average += proba[c, i]*(i+1)
+    
+            Z_energy = np.append(Z_energy, average)
+        e_nb = np.append(e_nb, Z_energy)
+    
+    print(energy, e_nb)
+    
+    # graph
+    
+    plt.figure()
+    element= correspondence(Z, 0, s, 0)[0]
+    gap = correspondence(Z, 0, s, 0)[2]
+    plt.plot(e_nb, energy, drawstyle = 'steps', label = "energy")
+    plt.title("Energy for " + element+" ("+gap+"-shell vacancy)")
+    plt.legend()
+    plt.xlabel("number of electrons")
+    plt.ylabel("energy (eV)")
+    #plt.savefig("energy_"+element+"_"+gap+"-shell.png")
+
+    return(e_nb, proba)
 
 
 """
@@ -200,4 +246,7 @@ Applications of the functions
 #fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
 
 # Oxygen ions energy:
-energy(8, 1)
+#energy(8, 1)
+
+Z = energy_st(8, 1)
+
