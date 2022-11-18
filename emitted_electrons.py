@@ -198,37 +198,28 @@ def energy_st(Z, s):
     s_idx = s_idx[0]
         
     energy = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 4]
-    
-    Z_energy = []
-    e_nb = []
-    average = 0 # average number of electrons for a given Z and initial vacancy
+
+    e_nb = np.zeros(5) # average number of electrons for a given Z and initial vacancy
     #for i in range()
     proba = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 6:]/10000 # probability to get X electrons
     
     if table[Z_idx[0] + s_idx[0], 1] == s and table[Z_idx[0] + s_idx[0], 0] == Z:
         for c in range(len(proba)):
             for i in range(len(proba[0,:])) :
-                print(average)
-                average += proba[c, i]*(i+1)
-    
-            Z_energy = np.append(Z_energy, average)
-        e_nb = np.append(e_nb, Z_energy)
-    
-    print(energy, e_nb)
+                e_nb[c] += proba[c, i]*(i+1)
     
     # graph
-    
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
     gap = correspondence(Z, 0, s, 0)[2]
-    plt.plot(e_nb, energy, drawstyle = 'steps', label = "energy")
-    plt.title("Energy for " + element+" ("+gap+"-shell vacancy)")
+    plt.plot(energy, e_nb, drawstyle = 'steps', label = gap+" shell vacancy")
+    plt.title("Energy for " + element)
     plt.legend()
-    plt.xlabel("number of electrons")
-    plt.ylabel("energy (eV)")
-    #plt.savefig("energy_"+element+"_"+gap+"-shell.png")
+    plt.ylabel("number of electrons")
+    plt.xlabel("energy (eV)")
+    plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
 
-    return(e_nb, proba)
+    return(e_nb)
 
 
 """
