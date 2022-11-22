@@ -210,7 +210,13 @@ def energy_st(Z, s):
             energy[c] += table[Z_idx[0]+s_idx[c], 4]
             for i in range(len(proba)) :
                 e_nb[c] += proba[i]*(i+1)
-            
+        
+    # we need to sort the energy in ascending order
+    zipped_lists = zip(energy, e_nb)
+    sorted_pairs = sorted(zipped_lists)
+    tuples = zip(*sorted_pairs)
+    energy, e_nb =  [list(tuple) for tuple in tuples]
+    
     # graph
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
@@ -242,5 +248,5 @@ Applications of the functions
 #energy(8, 1)
 
 # Oxygens ions energy for each ionisation stage (shown as the most probable number of electrons)
-Z = energy_st(27, 1)
+Z = energy_st(30, 3)
 
