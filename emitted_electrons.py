@@ -212,21 +212,21 @@ def energy_st(Z, s):
                 e_nb[c] += proba[i]*(i+1)
         
     # we need to sort the energy in ascending order
-    zipped_lists = zip(energy, e_nb)
+    zipped_lists = zip(e_nb, energy)
     sorted_pairs = sorted(zipped_lists)
     tuples = zip(*sorted_pairs)
-    energy, e_nb =  [list(tuple) for tuple in tuples]
+    e_nb, energy =  [list(tuple) for tuple in tuples]
     
     # graph
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
     gap = correspondence(Z, 0, s, 0)[2]
-    plt.plot(energy, e_nb, drawstyle = 'steps', label = gap+" shell vacancy")
+    plt.plot(e_nb, energy, drawstyle = 'steps', label = gap+" shell vacancy")
     plt.title("Energy for " + element)
     plt.legend()
-    plt.ylabel("number of electrons")
-    plt.xlabel("energy (eV)")
-    #plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
+    plt.xlabel("number of electrons")
+    plt.ylabel("energy (eV)")
+    plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
     return(e_nb, energy)
 
 
@@ -247,6 +247,6 @@ Applications of the functions
 # Oxygen ions energy:
 #energy(8, 1)
 
-# Oxygens ions energy for each ionisation stage (shown as the most probable number of electrons)
+# Ions energy for each ionisation stage (shown as the most probable number of electrons)
 Z = energy_st(30, 3)
 
