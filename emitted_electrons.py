@@ -196,29 +196,21 @@ def energy_st(Z, s):
     elif (len(Z_idx) == 1):
         s_idx = np.where(table[Z_idx[0], 2] == s)
     s_idx = s_idx[0]
-    print(s_idx)
         
-    energy = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1], 4]
+    energy = np.zeros(len(s_idx))
     
-    proba = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1], 6:]/10000 # probability to get X electrons
-    e_nb = np.zeros(len(proba)) # average number of electrons for a given Z and initial vacancy
+    #proba = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 6:]/10000 # probability to get X electrons
+    e_nb = np.zeros(len(s_idx)) # average number of electrons for a given Z and initial vacancy
     
-    print(len(s_idx), len(proba), len(e_nb), len(energy))
-    """
-    if table[Z_idx[0] + s_idx[0], 2] == s and table[Z_idx[0] + s_idx[0], 0] == Z:
-        print(table[Z_idx[0] + s_idx[0], 2])
-        for c in range(len(proba)):
-            for i in range(len(proba[0,:])) :
-                e_nb[c] += proba[c, i]*(i+1)
-    """
     
     
     for c in range(len(s_idx)):
-        if table[Z_idx[0] + s_idx[c], 2] == s and table[Z_idx[0] + s_idx[0], 0] == Z:
-            #print(table[Z_idx[0] + s_idx[c-1], 2])
-            for i in range(len(proba[0,:])) :
-                e_nb[c] += proba[c, i]*(i+1)
-                
+        if table[Z_idx[0] + s_idx[c], 2] == s and table[Z_idx[0] + s_idx[c], 0] == Z:
+            proba = table[Z_idx[0]+s_idx[c], 6:]/10000
+            energy[c] += table[Z_idx[0]+s_idx[c], 4]
+            for i in range(len(proba)) :
+                e_nb[c] += proba[i]*(i+1)
+            
     # graph
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
@@ -250,5 +242,5 @@ Applications of the functions
 #energy(8, 1)
 
 # Oxygens ions energy for each ionisation stage (shown as the most probable number of electrons)
-Z = energy_st(8, 1)
+Z = energy_st(27, 1)
 
