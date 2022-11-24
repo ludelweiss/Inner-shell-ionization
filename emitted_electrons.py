@@ -33,7 +33,8 @@ fluo_tab = np.loadtxt("table3")
 
 
 def correspondence(Z, st, s, il):   # used to give the details of each ionisation in the graph legend/ title
-    return elements[Z-1], stages[st-1], gaps[s-1], ils[il-1]
+    il = ils[il-1]
+    return elements[Z-1], stages[st-1], gaps[s-1], il
 
 
 def electrons(Z, st, s):
@@ -318,3 +319,5 @@ X = fluo_tab[:, 0]
 plt.figure()
 plt.plot(X, Y)
 """
+
+print('\\frac{a}{b}')
