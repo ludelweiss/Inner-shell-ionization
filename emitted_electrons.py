@@ -231,6 +231,47 @@ def energy_st(Z, s):
     return(e_nb, energy)
 
 def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
+    print(il)
+    for Z in range(26):
+        Z += 5
+        print("Z", Z)
+        Z_idx = np.where(fluo_tab[:, 0] == Z)
+        Z_idx = Z_idx[0]
+        w = np.empty(30)    # base array for the fluorescence yield of a given element
+        w.fill(np.NaN)
+        if type(il) == int:
+            il = [il]
+        il_name = ""  # for the graph legend
+        
+        for I in range(len(il)) :
+            il_name = " ".join([il_name, correspondence(0, 0, 0, il[I])[3]])    # for the graph legend
+            
+            if len(Z_idx) > 1 :
+                il_idx = np.where(fluo_tab[Z_idx[0]:Z_idx[len(Z_idx)-1], 4] == il[I])
+            elif (len(Z_idx) == 1):
+                il_idx = np.where(fluo_tab[Z_idx[0], 4] == il[I])    
+            il_idx = il_idx[0]
+            print(il_idx)
+            for i in range(len(il_idx)):
+                if fluo_tab[Z_idx[0] + il_idx[i], 1] == st and fluo_tab[Z_idx[0] + il_idx[i], 0] == Z:
+                    if np.isnan(w[Z]) :
+                        w[Z] = fluo_tab[Z_idx[0]+il_idx[i], 6]
+                    else :
+                        w[Z] += fluo_tab[Z_idx[0]+il_idx[i], 6]  
+          
+        # graph
+        #plt.figure()
+        x = np.arange(1, 31)
+        plt.plot(x, w, drawstyle = 'steps', label = il_name)
+        plt.title("Fluorescence yield for all elements")
+        plt.legend()
+        plt.xlabel("atomic number")
+        plt.ylabel("fluorescence yield")
+        #plt.savefig("fluorescence_yield" + il_name + ".png")
+        return(w)
+
+"""
+def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     for Z in range(4, 31):
         st_idx = np.where(fluo_tab[:, 1] == st)
         st_idx = st_idx[0]
@@ -269,6 +310,11 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
         #plt.savefig("fluorescence_yield" + il_name + ".png")
         return(w)
 """
+
+
+
+
+"""
 Applications of the functions
 """
 
@@ -284,15 +330,17 @@ Applications of the functions
 """
 for il in range(1, 5):
     fluo_yield(26, il)
-
+plt.figure()
 for il in range(5, 16):
     fluo_yield(26, il)
-
+plt.figure()
 for il in range(16, 23):
     fluo_yield(26, il)
+
 """
 st = 1
 # K-shell
+plt.figure()
 for il in range(1, 8, 2):
     all_fluo_yield(st, (il, il+1))
 
@@ -314,10 +362,6 @@ A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19),
 #Z = energy_st(8, 1)
 
 """
-Y = fluo_tab[:, 6]
-X = fluo_tab[:, 0]
-plt.figure()
-plt.plot(X, Y)
+for i in range(5, 31, 1):
+    print(i)
 """
-
-print('\\frac{a}{b}')
