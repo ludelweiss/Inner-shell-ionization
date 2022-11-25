@@ -235,7 +235,6 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     w = np.empty(30)    # base array for the fluorescence yield of a given element
     w.fill(np.NaN)
     for Z in range(5, 31):
-        
         Z_idx = np.where(fluo_tab[:, 0] == Z)
         Z_idx = Z_idx[0]
         
@@ -257,11 +256,11 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
                         w[Z-1] = fluo_tab[Z_idx[0]+il_idx[i], 6]
                     else :
                         w[Z-1] += fluo_tab[Z_idx[0]+il_idx[i], 6]  
-        # graph
-        #plt.figure()
+    #graph
+    #plt.figure()
     x = np.arange(1, 31)
     plt.plot(x, w, drawstyle = 'steps', label = il_name)
-    plt.title("Fluorescence yield for all elements")
+    plt.title("Fluorescence yield for all neutral atoms (Z=5-30)")
     plt.legend()
     plt.xlabel("atomic number")
     plt.ylabel("fluorescence yield")
@@ -280,18 +279,8 @@ Applications of the functions
 # K alpha and K beta fluorescence for all ions of iron:
 #fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
 
-# All fluorescence yields:
-"""
-for il in range(1, 5):
-    fluo_yield(26, il)
-plt.figure()
-for il in range(5, 16):
-    fluo_yield(26, il)
-plt.figure()
-for il in range(16, 23):
-    fluo_yield(26, il)
+# All fluorescence yields of neutral elements:
 
-"""
 st = 1
 # K-shell
 plt.figure()
@@ -315,7 +304,8 @@ A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19),
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
 #Z = energy_st(8, 1)
 
-"""
-for i in range(5, 31, 1):
-    print(i)
-"""
+
+
+
+
+
