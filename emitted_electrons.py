@@ -278,6 +278,85 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
+def Z_st_s_idx(table, Z, st, s):
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    
+    if len(Z_idx) > 1 :
+        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
+    elif (len(Z_idx) == 1):
+        st_idx = np.where(table[Z_idx[0], 1] == st)
+    st_idx = st_idx[0]
+    
+    if len(st_idx) > 1:
+        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
+    elif (len(st_idx) == 1):
+        s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
+    s_idx = s_idx[0]
+    return(Z_idx, st_idx, s_idx)
+
+def avg_photon(Z, st, s):
+    """
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    
+    if len(Z_idx) > 1 :
+        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
+    elif (len(Z_idx) == 1):
+        st_idx = np.where(table[Z_idx[0], 1] == st)
+    st_idx = st_idx[0]
+    
+    if len(st_idx) > 1:
+        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
+    elif (len(st_idx) == 1):
+        s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
+    s_idx = s_idx[0]
+    """
+    """
+    Z_idx, st_idx, s_idx = Z_st_s_idx(table, Z, st, s)
+    
+    if len(s_idx) > 1:
+        proba_e = table[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[len(s_idx)-1]+1, 6:]
+    elif (len(s_idx) == 1):
+        proba_e = table[Z_idx[0]+st_idx[0]+s_idx[0], 6:]
+        
+    N_e = 0
+    for n in range(len(proba_e)):
+        N_e += proba_e[n]*(n+1)
+    # was all that part useful?
+    """
+    Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
+    Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
+
+    for delta in range(max(fluo_tab[:, 3])):
+        print(delta)
+        
+        if len(s_idx) > 1:
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx:Z_idx[len(s_idx)-1]+1, 3] == delta)
+        elif (len(s_idx) == 1):
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
+        D_idx = D_idx[0]
+        
+        if len(D_idx)>1:
+            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[len(D_idx)-1]+1,6]
+            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[len(D_idx)-1]+1,5]
+        elif len(D_idx)==1:
+            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
+            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
+        N_p = 0     # number of emitted photons
+        E_p = 0
+        for il in range(len(w)):
+            N_p += w[il]
+            E_p += E_p_all[il]*w[il]
+            
+        if len(s_idx2) > 1:
+            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]
+        elif (len(s_idx2) == 1):
+            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]
+            
+        
+    
+
 
 """
 Applications of the functions
@@ -314,9 +393,7 @@ A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19),
 #energy(8, 1)
 
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
-Z = energy_st(8, 1)
-
-
+#Z = energy_st(8, 1)
 
 
 
