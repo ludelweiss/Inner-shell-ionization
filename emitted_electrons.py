@@ -138,6 +138,7 @@ def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be add
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
+
 def energy(Z, s):
     Z_idx = np.where(table[:, 0] == Z)
     Z_idx = Z_idx[0]
@@ -187,7 +188,6 @@ def energy(Z, s):
     return(energy_I, energy_E, energy_I + energy_E)
 
 
-
 def energy_st(Z, s):
     Z_idx = np.where(table[:, 0] == Z)
     Z_idx = Z_idx[0]
@@ -199,11 +199,7 @@ def energy_st(Z, s):
     s_idx = s_idx[0]
         
     energy = np.zeros(len(s_idx))
-    
-    #proba = table[Z_idx[0]+s_idx[0] : Z_idx[0]+s_idx[len(s_idx)-1]+1, 6:]/10000 # probability to get X electrons
     e_nb = np.zeros(len(s_idx)) # average number of electrons for a given Z and initial vacancy
-    
-    
     
     for c in range(len(s_idx)):
         if table[Z_idx[0] + s_idx[c], 2] == s and table[Z_idx[0] + s_idx[c], 0] == Z:
@@ -218,16 +214,31 @@ def energy_st(Z, s):
     tuples = zip(*sorted_pairs)
     e_nb, energy =  [list(tuple) for tuple in tuples]
     
+    
     # graph
+    ionisation = np.zeros(len(s_idx))
+    
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
     gap = correspondence(Z, 0, s, 0)[2]
+    """
+    fig, ax = plt.subplots()
+    twin = ax.twiny()
+    
+    p1 = ax.plot(e_nb, energy, drawstyle='steps', label=gap+" shell vacancy")
+    p2 = twin.plot(e_nb, ionisation, drawstyle='steps')
+    plt.show()
+    
+    
+    """
     plt.plot(e_nb, energy, drawstyle = 'steps', label = gap+" shell vacancy")
     plt.title("Energy for " + element)
     plt.legend()
     plt.xlabel("number of electrons")
     plt.ylabel("energy (eV)")
-    plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
+    #plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
+    
+    
     return(e_nb, energy)
 
 
@@ -267,6 +278,7 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
+
 """
 Applications of the functions
 """
@@ -280,7 +292,7 @@ Applications of the functions
 #fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
 
 # All fluorescence yields of neutral elements:
-
+"""
 st = 1
 # K-shell
 plt.figure()
@@ -296,13 +308,13 @@ all_fluo_yield(st, (13,14)), all_fluo_yield(st, 15)
 # M-shell
 plt.figure()
 A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all_fluo_yield(st, (20,21)), all_fluo_yield(st, 22)
-
+"""
 
 # Oxygen ions energy:
 #energy(8, 1)
 
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
-#Z = energy_st(8, 1)
+Z = energy_st(8, 1)
 
 
 
