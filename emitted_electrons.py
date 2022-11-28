@@ -100,6 +100,34 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     plt.savefig("nb_of_electrons_" + gap + "-shell.png")
     return(electrons_nb)
 
+def all_electrons_fluo(S):
+    electron_nb = []
+    for z in range(5,30) :
+        Z_idx = np.where(fluo_tab[:, 0] == z)
+        Z_idx = Z_idx[0]
+        if S==1:
+            e_nb = 0
+            s_idx = np.where(fluo_tab[Z_idx[0]: Z_idx[len(Z_idx)-1]+1, 2]==S)
+            s_idx = s_idx[0]
+            if fluo_tab[Z_idx[0] + s_idx[S-1], 1] == 1 and fluo_tab[Z_idx[0] + s_idx[S-1], 0] == z and fluo_tab[Z_idx[0] + s_idx[S-1], 2] == S:
+                for i in range(len(s_idx)):
+                    e_nb += fluo_tab[Z_idx[0]+s_idx[i], 3] # number of electrons
+                electron_nb = np.append(electron_nb, e_nb)
+            
+            
+    
+    # Plotting the graph
+    #plt.figure()
+    gap = correspondence(0, 0, S, 0)[2]    # the only relevant data is the gap type
+    x = np.arange(6,31)
+    plt.plot(x, electron_nb , drawstyle = 'steps', label = gap + "-shell vacancy")
+    plt.title("Electrons emitted during the decay of an inner-shell vacancy")
+    plt.legend()
+    plt.xlabel("Atomic number")
+    plt.ylabel("Number of Auger electrons")
+    #plt.savefig("nb_of_electrons_" + gap + "-shell.png")
+    return(electron_nb)
+
 
 def fluo_yield(Z, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     Z_idx = np.where(fluo_tab[:, 0] == Z)
@@ -396,5 +424,5 @@ A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19),
 #Z = energy_st(8, 1)
 
 
-
+A = all_electrons_fluo(1)
 
