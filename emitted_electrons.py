@@ -355,12 +355,14 @@ def avg_photon(Z, st, s):
     """
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
+    
+    avg_N = []
+    avg_E = []
 
-    for delta in range(max(fluo_tab[:, 3])):
-        print(delta)
+    for delta in range(int(max(fluo_tab[:, 3]))):
         
         if len(s_idx) > 1:
-            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx:Z_idx[len(s_idx)-1]+1, 3] == delta)
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[len(s_idx)-1]+1, 3] == delta)
         elif (len(s_idx) == 1):
             D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
         D_idx = D_idx[0]
@@ -378,10 +380,27 @@ def avg_photon(Z, st, s):
             E_p += E_p_all[il]*w[il]
             
         if len(s_idx2) > 1:
-            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]
+            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
         elif (len(s_idx2) == 1):
-            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]
-            
+            proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
+        for i in range(len(proba_e)):
+            if proba_e[i]>1:
+                proba_e[i] = proba_e[i]-1
+        print(proba_e)
+        avg_N = np.append(avg_N, proba_e*N_p)
+        avg_E = np.append(avg_E, proba_e*E_p)
+        
+        plt.figure()
+        plt.plot(avg_N, avg_E, drawstyle = 'steps')
+        plt.title("Average number of Auger electrons and their energy")
+        plt.legend()
+        plt.xlabel("Number of Auger electrons")
+        plt.ylabel("Average energy")
+        #plt.savefig("energies.png")
+        return(avg_N, avg_E)
+        
+        
+        
         
     
 
@@ -423,6 +442,10 @@ A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19),
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
 #Z = energy_st(8, 1)
 
+# not correct
+#A = all_electrons_fluo(1)
 
-A = all_electrons_fluo(1)
+
+B = avg_photon(8, 1, 1)
+
 
