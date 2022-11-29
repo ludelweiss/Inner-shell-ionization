@@ -324,43 +324,24 @@ def Z_st_s_idx(table, Z, st, s):
     return(Z_idx, st_idx, s_idx)
 
 def avg_photon(Z, st, s):
-    """
-    Z_idx = np.where(table[:, 0] == Z)
-    Z_idx = Z_idx[0]
-    
-    if len(Z_idx) > 1 :
-        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
-    elif (len(Z_idx) == 1):
-        st_idx = np.where(table[Z_idx[0], 1] == st)
-    st_idx = st_idx[0]
-    
-    if len(st_idx) > 1:
-        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
-    elif (len(st_idx) == 1):
-        s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
-    s_idx = s_idx[0]
-    """
-    """
-    Z_idx, st_idx, s_idx = Z_st_s_idx(table, Z, st, s)
-    
-    if len(s_idx) > 1:
-        proba_e = table[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[len(s_idx)-1]+1, 6:]
-    elif (len(s_idx) == 1):
-        proba_e = table[Z_idx[0]+st_idx[0]+s_idx[0], 6:]
-        
-    N_e = 0
-    for n in range(len(proba_e)):
-        N_e += proba_e[n]*(n+1)
-    # was all that part useful?
-    """
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
     
-    avg_N = []
-    avg_E = []
-
-    for delta in range(int(max(fluo_tab[:, 3]))):
+    avg_N = 0
+    avg_E = 0
+    
+    if len(s_idx2) > 1:
+        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]
+    elif (len(s_idx2) == 1):
+        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]
         
+    N_e = 0
+    for n in range(len(proba)):
+        N_e += proba[n]*(n+1)/10000
+    N_e -= 1
+    
+    MAX = int(max(fluo_tab[:, 3]))
+    for delta in range(MAX+1):
         if len(s_idx) > 1:
             D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[len(s_idx)-1]+1, 3] == delta)
         elif (len(s_idx) == 1):
@@ -373,34 +354,34 @@ def avg_photon(Z, st, s):
         elif len(D_idx)==1:
             w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
             E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
-        N_p = 0     # number of emitted photons
-        E_p = 0
+        N_p = np.zeros(MAX+1)     # number of emitted photons
+        E_p = np.zeros(MAX+1)
+        
         for il in range(len(w)):
-            N_p += w[il]
-            E_p += E_p_all[il]*w[il]
-            
+            N_p[delta]= w[il]
+            E_p[delta]= E_p_all[il]*w[il]
         if len(s_idx2) > 1:
             proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
         elif (len(s_idx2) == 1):
             proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
+        """
         for i in range(len(proba_e)):
-            if proba_e[i]>1:
-                proba_e[i] = proba_e[i]-1
-        print(proba_e)
-        avg_N = np.append(avg_N, proba_e*N_p)
-        avg_E = np.append(avg_E, proba_e*E_p)
+            e_nb += proba_e[i]*(i+1)
+            
+        avg_N = np.append(avg_N, e_nb*N_p)
+        avg_E = np.append(avg_E, e_nb*E_p)
+        """
+        avg_N+=proba_e[delta]*N_p[delta]
+        avg_E+=proba_e[delta]*E_p[delta]
         
-        plt.figure()
-        plt.plot(avg_N, avg_E, drawstyle = 'steps')
-        plt.title("Average number of Auger electrons and their energy")
-        plt.legend()
-        plt.xlabel("Number of Auger electrons")
-        plt.ylabel("Average energy")
-        #plt.savefig("energies.png")
-        return(avg_N, avg_E)
-        
-        
-        
+    plt.figure()
+    plt.plot(avg_N, avg_E, drawstyle = 'steps', label="Average photon energy")
+    plt.title("Average number of photons and their energy")
+    plt.legend()
+    plt.xlabel("Number of photons ejected")
+    plt.ylabel("Average energy")
+    #plt.savefig("energies.png")
+    return(avg_N, avg_E, N_e)
         
     
 
