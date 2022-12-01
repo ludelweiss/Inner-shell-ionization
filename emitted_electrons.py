@@ -327,19 +327,20 @@ def avg_photon(Z, st, s):
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
     
+    
     avg_N = 0
     avg_E = 0
     
+    # Calculating the average number of Auger electron emitted N_e
     if len(s_idx2) > 1:
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]
     elif (len(s_idx2) == 1):
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]
-        
     N_e = 0
     for n in range(len(proba)):
-        N_e += proba[n]*(n+1)/10000
-    N_e -= 1
+        N_e += proba[n]*n/10000     # n instead of n+1 to remove the photo-electron (1-10 electrons -> 0-9 Auger electrons)
     
+    # Calculating the average photon number avg_N and the average photon energy avg_E
     MAX = int(max(fluo_tab[:, 3]))
     for delta in range(MAX+1):
         if len(s_idx) > 1:
@@ -349,8 +350,8 @@ def avg_photon(Z, st, s):
         D_idx = D_idx[0]
         
         if len(D_idx)>1:
-            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[len(D_idx)-1]+1,6]
-            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[len(D_idx)-1]+1,5]
+            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),6]
+            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),5]
         elif len(D_idx)==1:
             w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
             E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
@@ -358,8 +359,8 @@ def avg_photon(Z, st, s):
         E_p = np.zeros(MAX+1)
         
         for il in range(len(w)):
-            N_p[delta]= w[il]
-            E_p[delta]= E_p_all[il]*w[il]
+            N_p[delta] += w[il]
+            E_p[delta] += E_p_all[il]*w[il]
         if len(s_idx2) > 1:
             proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
         elif (len(s_idx2) == 1):
@@ -371,6 +372,7 @@ def avg_photon(Z, st, s):
         avg_N = np.append(avg_N, e_nb*N_p)
         avg_E = np.append(avg_E, e_nb*E_p)
         """
+        #print("delta:", delta, "proba:", proba_e[delta], "N:", N_p[delta], "E:", E_p[delta])
         avg_N+=proba_e[delta]*N_p[delta]
         avg_E+=proba_e[delta]*E_p[delta]
         
@@ -381,6 +383,7 @@ def avg_photon(Z, st, s):
     plt.xlabel("Number of photons ejected")
     plt.ylabel("Average energy")
     #plt.savefig("energies.png")
+    print(avg_N, avg_E, N_e)
     return(avg_N, avg_E, N_e)
         
     
