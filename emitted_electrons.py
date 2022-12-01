@@ -47,7 +47,7 @@ def Z_st_s_idx(table, Z, st, s):
     st_idx = st_idx[0]
     
     if len(st_idx) > 1:
-        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
+        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[0]+st_idx[0]+(len(st_idx)-1), 2] == s)
     elif (len(st_idx) == 1):
         s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
     s_idx = s_idx[0]
@@ -117,7 +117,6 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     plt.savefig("nb_of_electrons_" + gap + "-shell.png")
     return(electrons_nb)
 
-def all_electrons_fluo(S):
     electron_nb = []
     for z in range(5,30) :
         Z_idx = np.where(fluo_tab[:, 0] == z)
@@ -286,7 +285,7 @@ def energy_st(Z, s):
     
     return(e_nb, energy)
 
-# Should probably delete following function:
+
 def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     w = np.empty(30)    # base array for the fluorescence yield of a given element
     w.fill(np.NaN)
@@ -324,10 +323,10 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     return(w)
 
 
-
 def avg_photon(Z, st, s):
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
+    print(Z_idx, st_idx, s_idx, Z_idx2, st_idx2, s_idx2)
     
     avg_N = 0
     avg_E = 0
@@ -337,7 +336,10 @@ def avg_photon(Z, st, s):
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]
     elif (len(s_idx2) == 1):
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]
+    else:
+        return
     N_e = 0
+    
     for n in range(len(proba)):
         N_e += proba[n]*n/10000     # n instead of n+1 to remove the photo-electron (1-10 electrons -> 0-9 Auger electrons)
     
@@ -348,17 +350,21 @@ def avg_photon(Z, st, s):
             D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[len(s_idx)-1]+1, 3] == delta)
         elif (len(s_idx) == 1):
             D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
+        else:
+            return
         D_idx = D_idx[0]
-        
+        print(D_idx)
         if len(D_idx)>1:
             w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),6]
             E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),5]
         elif len(D_idx)==1:
             w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
             E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
+        elif len(D_idx)<1:
+            return
         N_p = np.zeros(MAX+1)     # number of emitted photons
         E_p = np.zeros(MAX+1)
-        
+        print("test")
         for il in range(len(w)):
             N_p[delta] += w[il]
             E_p[delta] += E_p_all[il]*w[il]
@@ -409,10 +415,19 @@ all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
 #energy_st(8, 1)
 
-# not correct (should delete function?)
-#all_electrons_fluo(1)
-
 # Average number of photons, average photon energy and average number of Auger electrons for oxygens atoms with a K_shell vacancy
-B = avg_photon(8, 1, 1)
+#avg_photon(8, 1, 1)
+
+
+for s in range(1, 26):
+    print(s)
+    """
+    Z, st, s = Z_st_s_idx(fluo_tab, 8, 2, s)
+    print(Z, st, s)
+    """
+    print(avg_photon(8, 2, s))
+
+
+
 
 
