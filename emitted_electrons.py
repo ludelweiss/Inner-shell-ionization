@@ -36,6 +36,23 @@ def correspondence(Z, st, s, il):   # used to give the details of each ionisatio
     il = ils[il-1]
     return elements[Z-1], stages[st-1], gaps[s-1], il
 
+def Z_st_s_idx(table, Z, st, s):
+    Z_idx = np.where(table[:, 0] == Z)
+    Z_idx = Z_idx[0]
+    
+    if len(Z_idx) > 1 :
+        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
+    elif (len(Z_idx) == 1):
+        st_idx = np.where(table[Z_idx[0], 1] == st)
+    st_idx = st_idx[0]
+    
+    if len(st_idx) > 1:
+        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
+    elif (len(st_idx) == 1):
+        s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
+    s_idx = s_idx[0]
+    return(Z_idx, st_idx, s_idx)
+
 
 def electrons(Z, st, s):
     # extracting the right Z and ionisation stage indexes from the data
@@ -269,7 +286,7 @@ def energy_st(Z, s):
     
     return(e_nb, energy)
 
-
+# Should probably delete following function:
 def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will be added into a single fluorescence yield (example : K alpha_1 + K alpha_2 to get K alpha)
     w = np.empty(30)    # base array for the fluorescence yield of a given element
     w.fill(np.NaN)
@@ -306,27 +323,11 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
-def Z_st_s_idx(table, Z, st, s):
-    Z_idx = np.where(table[:, 0] == Z)
-    Z_idx = Z_idx[0]
-    
-    if len(Z_idx) > 1 :
-        st_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 1] == st)
-    elif (len(Z_idx) == 1):
-        st_idx = np.where(table[Z_idx[0], 1] == st)
-    st_idx = st_idx[0]
-    
-    if len(st_idx) > 1:
-        s_idx = np.where(table[Z_idx[0]+st_idx[0]:Z_idx[len(st_idx)-1]+1, 2] == s)
-    elif (len(st_idx) == 1):
-        s_idx = np.where(table[Z_idx[0]+st_idx[0], 2] == s)
-    s_idx = s_idx[0]
-    return(Z_idx, st_idx, s_idx)
+
 
 def avg_photon(Z, st, s):
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
-    
     
     avg_N = 0
     avg_E = 0
@@ -365,29 +366,11 @@ def avg_photon(Z, st, s):
             proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
         elif (len(s_idx2) == 1):
             proba_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
-        """
-        for i in range(len(proba_e)):
-            e_nb += proba_e[i]*(i+1)
-            
-        avg_N = np.append(avg_N, e_nb*N_p)
-        avg_E = np.append(avg_E, e_nb*E_p)
-        """
-        #print("delta:", delta, "proba:", proba_e[delta], "N:", N_p[delta], "E:", E_p[delta])
         avg_N+=proba_e[delta]*N_p[delta]
         avg_E+=proba_e[delta]*E_p[delta]
-        
-    plt.figure()
-    plt.plot(avg_N, avg_E, drawstyle = 'steps', label="Average photon energy")
-    plt.title("Average number of photons and their energy")
-    plt.legend()
-    plt.xlabel("Number of photons ejected")
-    plt.ylabel("Average energy")
-    #plt.savefig("energies.png")
-    print(avg_N, avg_E, N_e)
     return(avg_N, avg_E, N_e)
         
     
-
 
 """
 Applications of the functions
@@ -417,19 +400,19 @@ all_fluo_yield(st, (13,14)), all_fluo_yield(st, 15)
 
 # M-shell
 plt.figure()
-A = all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all_fluo_yield(st, (20,21)), all_fluo_yield(st, 22)
+all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all_fluo_yield(st, (20,21)), all_fluo_yield(st, 22)
 """
 
 # Oxygen ions energy:
 #energy(8, 1)
 
 # Ions energy for each ionisation stage (shown as the most probable number of electrons)
-#Z = energy_st(8, 1)
+#energy_st(8, 1)
 
-# not correct
-#A = all_electrons_fluo(1)
+# not correct (should delete function?)
+#all_electrons_fluo(1)
 
-
+# Average number of photons, average photon energy and average number of Auger electrons for oxygens atoms with a K_shell vacancy
 B = avg_photon(8, 1, 1)
 
 
