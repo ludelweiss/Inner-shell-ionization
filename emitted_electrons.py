@@ -339,7 +339,6 @@ def avg_photon(Z, st, s):
     elif (len(s_idx2) == 1):
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
         E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 4]
-    
     else:
         #print(1)
         return([])
@@ -347,7 +346,6 @@ def avg_photon(Z, st, s):
     N_e = 0
     for n in range(len(proba)):
         N_e += proba[n]*n    # n instead of n+1 to remove the photo-electron (1-10 electrons -> 0-9 Auger electrons)
-    
     
     # Calculating the average photon number avg_N and the average photon energy avg_E
     MAX = int(max(fluo_tab[:, 3]))
@@ -427,8 +425,7 @@ all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all
 # Average number of photons, average photon energy and average number of Auger electrons for oxygens atoms with a K_shell vacancy
 #avg_photon(8, 1, 1)
 
-
-# Z: 5-30, st: 1-26, s:1-22
+# Z: 5-30, st: 1-26, s:1-7
 """
 oxygen_tab = []
 for st in range(1, 5):
@@ -438,8 +435,9 @@ Q = np.reshape(oxygen_tab, (4, 7))
 
 
 energy_tab = []
-for Z in range(5, 10):
+for Z in range(5, 31):
     for st in range(1, 27):
-        for s in range(1, 23):
+        for s in range(1, 8):
+            #print(Z, st, s)
             energy_tab = np.append(energy_tab, avg_photon(Z, st, s))
-energy_tab = np.reshape(energy_tab, (15, 7))
+energy_tab = np.reshape(energy_tab, (1055, 7))
