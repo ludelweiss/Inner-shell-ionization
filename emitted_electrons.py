@@ -328,7 +328,6 @@ def avg_photon(Z, st, s):
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
     #print("Z", Z_idx,"st", st_idx,"s", s_idx,"Z2", Z_idx2,"st2", st_idx2,"s2", s_idx2)
-    
     avg_N = 0
     avg_E = 0
     
@@ -340,7 +339,6 @@ def avg_photon(Z, st, s):
         proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
         E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 4]
     else:
-        #print(1)
         return([])
     
     N_e = 0
@@ -351,11 +349,10 @@ def avg_photon(Z, st, s):
     MAX = int(max(fluo_tab[:, 3]))
     for delta in range(MAX+1):
         if len(s_idx) > 1:
-            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[st_idx[0]+s_idx[0]]+1, 3] == delta)
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[0]+st_idx[0]+s_idx[len(s_idx)-1]+1, 3] == delta)
         elif (len(s_idx) == 1):
             D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
         else:
-            #print(2)
             return([])
         
         D_idx = D_idx[0]
@@ -380,9 +377,7 @@ def avg_photon(Z, st, s):
                 E_p[delta] += E_p_all[il]*w[il]
         avg_N+=proba[delta]*N_p[delta]
         avg_E+=proba[delta]*E_p[delta]
-    #print(Z, st, s, N_e, E_e, avg_N, avg_E)
     return(Z, st, s, N_e, E_e, avg_N, avg_E)
-
 
 
 """
@@ -425,6 +420,7 @@ all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all
 # Average number of photons, average photon energy and average number of Auger electrons for oxygens atoms with a K_shell vacancy
 #avg_photon(8, 1, 1)
 
+
 # Z: 5-30, st: 1-26, s:1-7
 """
 oxygen_tab = []
@@ -432,8 +428,6 @@ for st in range(1, 5):
     oxygen_tab = np.append(oxygen_tab, avg_photon(8, st, 1))
 Q = np.reshape(oxygen_tab, (4, 7))
 """
-
-
 energy_tab = []
 for Z in range(5, 31):
     for st in range(1, 27):
