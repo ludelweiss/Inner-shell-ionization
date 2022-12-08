@@ -437,5 +437,3 @@ for Z in range(5, 31):
             energy_tab = np.append(energy_tab, avg_photon(Z, st, s))
 energy_tab = np.reshape(energy_tab, (1055, 7))
 """
-print(max(fluo_tab[:,1]), max(table[:,1]))
-print(max(fluo_tab[:,2]), max(table[:,2]))
