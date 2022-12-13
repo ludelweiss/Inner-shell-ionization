@@ -267,16 +267,7 @@ def energy_st(Z, s):
     plt.figure()
     element= correspondence(Z, 0, s, 0)[0]
     gap = correspondence(Z, 0, s, 0)[2]
-    """
-    fig, ax = plt.subplots()
-    twin = ax.twiny()
     
-    p1 = ax.plot(e_nb, energy, drawstyle='steps', label=gap+" shell vacancy")
-    p2 = twin.plot(e_nb, ionisation, drawstyle='steps')
-    plt.show()
-    
-    
-    """
     plt.plot(e_nb, energy, drawstyle = 'steps', label = gap+" shell vacancy")
     plt.title("Energy for " + element)
     plt.legend()
