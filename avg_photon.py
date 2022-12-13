@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pylab as plt
 from emitted_electrons import correspondence, Z_st_s_idx
 
-tab = np.loadtxt("avg_photons_electrons")
+tab = np.loadtxt("avg_photons_electrons2")
 
 def energy_Z(Z, s):
     Z_idx = Z_st_s_idx(tab, Z, 0, s)[0]
@@ -51,25 +51,24 @@ def energy_Z(Z, s):
     
     st_tab = np.arange(1, 27)
     E_p = [i * 10 for i in E_p]
-
-    """
-    zipped_lists = zip(N_e, E_e)
-    sorted_pairs = sorted(zipped_lists)
-    tuples = zip(*sorted_pairs)
-    N_e, energy_e =  [list(tuple) for tuple in tuples] 
-    """
+    empty = np.empty(26)
+    empty.fill(np.NaN)
     
     fig, ax = plt.subplots()
-    
+    #ax2 = ax.twiny()
     ax.plot(st_tab, E_e, drawstyle='steps', label="electrons energy")
     ax.plot(st_tab, E_p, drawstyle='steps', label="photons energy (x10)")
-    #ax2 = ax1.secondary_xaxis('top', functions=(N_e, E_e))
+    #ax2.plot(N_e, st_tab)
+    
     #ax2.set_xlabel('number of Auger electrons')
     
     plt.title("Z="+str(Z)+" and s="+str(s))
     plt.xlabel("Ionisation stage")
     plt.ylabel("Energy (eV)")
     plt.legend()
+    
     return(N_e, E_e, E_p)
     
-A = energy_Z(8, 1)
+A = energy_Z(17, 1)
+
+

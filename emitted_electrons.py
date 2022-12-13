@@ -315,6 +315,8 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
+"""
+# ORIGINAL function /!\
 def avg_photon(Z, st, s):
     Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
@@ -368,9 +370,74 @@ def avg_photon(Z, st, s):
                 E_p[delta] += E_p_all[il]*w[il]
         avg_N+=proba[delta]*N_p[delta]
         avg_E+=proba[delta]*E_p[delta]
+    
     return(Z, st, s, N_e, E_e, avg_N, avg_E)
+"""
 
-
+# new test function:
+def avg_photon2(Z, st, s):
+    if Z>4:
+        Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
+    Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
+    #print("Z", Z_idx,"st", st_idx,"s", s_idx,"Z2", Z_idx2,"st2", st_idx2,"s2", s_idx2)
+    avg_N = 0
+    avg_E = 0
+    
+    # Calculating the average number of Auger electron emitted N_e
+    if len(s_idx2) > 1:
+        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
+        E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 4]
+    elif len(s_idx2) == 1:
+        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
+        E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 4]
+    else:
+        return([])
+    
+    N_e = 0
+    for n in range(len(proba)):
+        N_e += proba[n]*n    # n instead of n+1 to remove the photo-electron (1-10 electrons -> 0-9 Auger electrons)
+    if Z<5:
+        return(Z, st, s, N_e, E_e, 0, 0)
+    
+    # Calculating the average photon number avg_N and the average photon energy avg_E
+    MAX = int(max(fluo_tab[:, 3]))
+    for delta in range(MAX+1):
+        if len(s_idx) > 1:
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[0]+st_idx[0]+s_idx[len(s_idx)-1]+1, 3] == delta)
+        elif len(s_idx) == 1:
+            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
+        elif len(s_idx2)!=0:
+            return(Z, st, s, N_e, E_e, 0, 0)    # we can stop now because there is no fluorescent yield in that situation
+        else:
+            return([])
+        
+        D_idx = D_idx[0]
+        if len(D_idx)>1:
+            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),6]
+            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),5]
+        elif len(D_idx)==1:
+            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
+            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
+        else:
+            w = []
+            E_p_all = []
+        
+        N_p = np.zeros(MAX+1)     # number of emitted photons
+        E_p = np.zeros(MAX+1)
+        if type(w)==np.float64:
+            N_p[delta] += w
+            E_p[delta] += E_p_all*w
+        else:
+            for il in range(len(w)):
+                N_p[delta] += w[il]
+                E_p[delta] += E_p_all[il]*w[il]
+        avg_N+=proba[delta]*N_p[delta]
+        avg_E+=proba[delta]*E_p[delta]
+    
+    
+    
+    
+    return(Z, st, s, N_e, E_e, avg_N, avg_E)
 """
 Applications of the functions
 """
@@ -419,12 +486,11 @@ for st in range(1, 5):
     oxygen_tab = np.append(oxygen_tab, avg_photon(8, st, 1))
 Q = np.reshape(oxygen_tab, (4, 7))
 """
-"""
+
 energy_tab = []
-for Z in range(5, 31):
-    for st in range(1, 27):
+for Z in range(4, 31):
+    for st in range(1, 28):
         for s in range(1, 8):
             #print(Z, st, s)
-            energy_tab = np.append(energy_tab, avg_photon(Z, st, s))
-energy_tab = np.reshape(energy_tab, (1055, 7))
-"""
+            energy_tab = np.append(energy_tab, avg_photon2(Z, st, s))
+energy_tab = np.reshape(energy_tab, (1090, 7))
