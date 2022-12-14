@@ -55,17 +55,18 @@ def energy_Z(Z, s):
     empty.fill(np.NaN)
     
     fig, ax = plt.subplots()
-    #ax2 = ax.twiny()
-    ax.plot(st_tab, E_e, drawstyle='steps', label="electrons energy")
-    ax.plot(st_tab, E_p, drawstyle='steps', label="photons energy (x10)")
-    #ax2.plot(N_e, st_tab)
-    
-    #ax2.set_xlabel('number of Auger electrons')
+    ax2 = ax.twinx()
+    ax.plot(st_tab, E_e, '--', drawstyle='steps', color='tab:blue', label="electrons energy")
+    ax.plot(st_tab, E_p, drawstyle='steps', color='tab:blue', label="photons energy (x10)")
+    ax2.plot(st_tab, N_e, drawstyle="steps", color='tab:orange', label='Number of Auger electrons')
+    ax.set_ylabel('Energy (eV)', color='tab:blue')
+    ax2.set_ylabel('number of Auger electrons', color='tab:orange')
     
     plt.title("Z="+str(Z)+" and s="+str(s))
-    plt.xlabel("Ionisation stage")
-    plt.ylabel("Energy (eV)")
-    plt.legend()
+    ax.set_xlabel("Ionisation stage")
+    #plt.ylabel("Energy (eV)")
+    ax.legend()
+    ax2.legend(loc="lower right")
     
     return(N_e, E_e, E_p)
     
