@@ -433,10 +433,6 @@ def avg_photon2(Z, st, s):
                 E_p[delta] += E_p_all[il]*w[il]
         avg_N+=proba[delta]*N_p[delta]
         avg_E+=proba[delta]*E_p[delta]
-    
-    
-    
-    
     return(Z, st, s, N_e, E_e, avg_N, avg_E)
 """
 Applications of the functions
