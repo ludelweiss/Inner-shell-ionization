@@ -26,6 +26,8 @@ def energy_st(Z, s):
     E_p.fill(np.NaN)
     N_e = np.empty(26)
     N_e.fill(np.NaN)
+    N_p = np.empty(26)
+    N_p.fill(np.NaN)
         
     for st in range(26):
         if len(Z_idx) > 1 :
@@ -48,6 +50,10 @@ def energy_st(Z, s):
                     N_e[st] = tab[Z_idx[0]+st_idx[ST], 3]
                 else:
                     N_e[st] += tab[Z_idx[0]+st_idx[ST], 3]
+                if np.isnan(N_p[st]):
+                    N_p[st] = tab[Z_idx[0]+st_idx[ST], 5]
+                else:
+                    N_p[st] += tab[Z_idx[0]+st_idx[ST], 5]
     
     st_tab = np.arange(1, 27)
     multiplicator = 10
@@ -55,15 +61,17 @@ def energy_st(Z, s):
     
     fig, ax = plt.subplots()
     ax2 = ax.twinx()
-    ax.plot(st_tab, E_e, '--', drawstyle='steps', color='tab:blue', label="electrons energy")
-    ax.plot(st_tab, E_p, drawstyle='steps', color='tab:blue', label="photons energy (x"+str(multiplicator)+")")
-    ax2.plot(st_tab, N_e, drawstyle="steps", color='tab:orange')
+    ax.plot(st_tab, E_e, drawstyle='steps', color='tab:blue', label="electrons energy")
+    ax.plot(st_tab, E_p, '--', drawstyle='steps', color='tab:blue', label="photons energy (x"+str(multiplicator)+")")
+    ax2.plot(st_tab, N_e, drawstyle="steps", color='tab:orange', label="number of Auger electrons")
+    ax2.plot(st_tab, N_p, '--', drawstyle="steps", color='tab:orange', label="number of photons")
     ax.set_ylabel('Energy (eV)', color='tab:blue')
-    ax2.set_ylabel('number of Auger electrons', color='tab:orange')
+    ax2.set_ylabel("number of photons/ electrons", color='tab:orange')
     
     plt.title("Z="+str(Z)+" and s="+str(s))
     ax.set_xlabel("Ionisation stage")
     ax.legend()
+    ax2.legend()
     return(N_e, E_e, E_p)
     
 
@@ -71,6 +79,7 @@ def energy_Z(s):
     E_e = []
     E_p = []
     N_e = []
+    N_p = []
     gap = correspondence(0, 0, s, 0)[2]
     
     for Z in range(4, 31):
@@ -79,10 +88,12 @@ def energy_Z(s):
             E_e = np.append(E_e, np.NaN)
             E_p = np.append(E_p, np.NaN)
             N_e = np.append(N_e, np.NaN)
+            N_p = np.append(N_p, np.NaN)
         else: 
             E_e = np.append(E_e, tab[Z_idx[0]+st_idx[0]+s_idx[0], 4])
             E_p = np.append(E_p, tab[Z_idx[0]+st_idx[0]+s_idx[0], 6])
             N_e = np.append(N_e, tab[Z_idx[0]+st_idx[0]+s_idx[0], 3])
+            N_p = np.append(N_p, tab[Z_idx[0]+st_idx[0]+s_idx[0], 5])
     
     Z_tab = np.arange(4, 31)
     multiplicator = 10000
@@ -90,20 +101,22 @@ def energy_Z(s):
     
     fig, ax = plt.subplots()
     ax2 = ax.twinx()
-    ax2.plot(Z_tab, N_e, drawstyle="steps", color='tab:orange')
-    ax.plot(Z_tab, E_e, '--', drawstyle='steps', color='tab:blue', label="electrons energy")
-    ax.plot(Z_tab, E_p, drawstyle='steps', color='tab:blue', label="photons energy (x"+str(multiplicator)+")")
-    ax2.set_ylabel('number of Auger electrons', color='tab:orange')
+    ax2.plot(Z_tab, N_e, drawstyle="steps", color='tab:orange', label="number of electrons")
+    ax2.plot(Z_tab, N_p, '--', drawstyle="steps", color='tab:orange', label="number of photons")
+    ax.plot(Z_tab, E_e, drawstyle='steps', color='tab:blue', label="electrons energy")
+    ax.plot(Z_tab, E_p, '--', drawstyle='steps', color='tab:blue', label="photons energy (x"+str(multiplicator)+")")
+    ax2.set_ylabel('number of photons/ electrons', color='tab:orange')
     ax.set_ylabel('Energy (eV)', color='tab:blue')
     plt.title("Neutral atoms with a "+gap+"-shell gap")
     ax.set_xlabel("Atomic number")
     ax.legend(loc="lower right")
+    ax2.legend()
     #plt.savefig("avg_photon_e_"+gap+"-shell.png")
     return(N_e, E_e, E_p)
 
 
 
-#A = energy_st(17, 1)
+A = energy_st(17, 1)
 
-A = (energy_Z(6), energy_Z(7))
+B = (energy_Z(6), energy_Z(7))
 
