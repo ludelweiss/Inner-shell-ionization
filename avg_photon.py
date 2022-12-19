@@ -70,7 +70,7 @@ def energy_st(Z, s):
     
     plt.title("Z="+str(Z)+" and s="+str(s))
     ax.set_xlabel("Ionisation stage")
-    ax.legend()
+    ax.legend(loc="lower right")
     ax2.legend()
     return(N_e, E_e, E_p)
     
@@ -116,7 +116,8 @@ def energy_Z(s):
 
 
 
-A = energy_st(17, 1)
+A = energy_st(17, 2)
 
-B = (energy_Z(6), energy_Z(7))
+for I in range(1, 8):
+    energy_Z(I)
 
