@@ -111,13 +111,15 @@ def energy_Z(s):
     ax.set_xlabel("Atomic number")
     ax.legend(loc="lower right")
     ax2.legend()
-    #plt.savefig("avg_photon_e_"+gap+"-shell.png")
+    plt.savefig("avg_photon_e_"+gap+"-shell.png")
     return(N_e, E_e, E_p)
 
 
 
-A = energy_st(17, 2)
+#A = energy_st(17, 2)
 
+"""
 for I in range(1, 8):
     energy_Z(I)
+"""
 
