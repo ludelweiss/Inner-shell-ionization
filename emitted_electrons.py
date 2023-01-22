@@ -25,6 +25,7 @@ fluo_yield(Z, il): fluorescence yield for all ions of an element.
 energy(Z, s): energy distribution (ionisation and Auger electron) for all ions of a given element and inner shell.
 energy_st(Z, s): energy per number of electrons for a given ionisation stage of an element and a given inner shell.
 all_fluo_yield(st, il): fluorescence yield for all enutral atoms for a given fluorescence transition.
+
 avg_photon(Z, st, s): was used to obtain the table with the mean number of electrons and the mean number and photons energy
 """
 
@@ -94,7 +95,6 @@ def electrons(Z, st, s):
     plt.xlabel("Number of emitted electrons")
     plt.ylabel("Probability")
     plt.savefig('graph_' + element + '_' + stage + '_' + gap + '.png')
-    
     return(proba)
 
 
@@ -143,7 +143,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
     
     # Plotting the graph
     #plt.figure()
-    gap = correspondence(0, 0, S, 0)[2]    # the only relevant data is the gap type
+    gap = correspondence(0, 0, S, 0)[2]    # the only useful value is the gap type
     x = np.arange(6,31)
     plt.plot(x, electron_nb , drawstyle = 'steps', label = gap + "-shell vacancy")
     plt.title("Electrons emitted during the decay of an inner-shell vacancy")
@@ -198,7 +198,6 @@ def energy(Z, s):
     
     if len(Z_idx) > 1 :
         s_idx = np.where(table[Z_idx[0]:Z_idx[len(Z_idx)-1]+1, 2] == s)
-
     elif (len(Z_idx) == 1):
         s_idx = np.where(table[Z_idx[0], 2] == s)
     s_idx = s_idx[0]
@@ -260,13 +259,12 @@ def energy_st(Z, s):
             energy[c] += table[Z_idx[0]+s_idx[c], 4]
             for i in range(len(proba)) :
                 e_nb[c] += proba[i]*(i+1)
-        
+    
     # we need to sort the energy in ascending order
     zipped_lists = zip(e_nb, energy)
     sorted_pairs = sorted(zipped_lists)
     tuples = zip(*sorted_pairs)
     e_nb, energy =  [list(tuple) for tuple in tuples]
-    
     
     # graph
     ionisation = np.zeros(len(s_idx))
@@ -281,8 +279,6 @@ def energy_st(Z, s):
     plt.xlabel("number of electrons")
     plt.ylabel("energy (eV)")
     #plt.savefig("energy_per_electron_"+element+"_"+gap+"-shell.png")
-    
-    
     return(e_nb, energy)
 
 

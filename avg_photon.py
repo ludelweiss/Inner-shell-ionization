@@ -4,6 +4,13 @@
 Created on Thu Dec  8 19:05:26 2022
 
 @author: Ludmilla Allard
+
+All functions are using the new table created in emitted_electrons.py
+
+Recap of all functions:
+
+energy_st(Z, s): number and energy distributions of emitted electrons and photons for each ionisation stage for a given atomic number and inner shell.
+energy_Z(s): number and energy distributions of emitted electrons and photons for all neutral atoms and a given inner shell.
 """
 
 import numpy as np
@@ -11,6 +18,7 @@ import matplotlib.pylab as plt
 from emitted_electrons import correspondence, Z_st_s_idx
 
 tab = np.loadtxt("avg_photons_electrons2")
+
 
 def energy_st(Z, s):
     Z_idx = Z_st_s_idx(tab, Z, 0, s)[0]
@@ -122,7 +130,6 @@ def energy_Z(s):
     plt.xlabel("Atomic number")
     plt.savefig("mean_number_"+gap+"-shell.png")
     
-    
     #Both distributions on the same graph (two axis)
     """
     fig, ax = plt.subplots()
@@ -140,8 +147,9 @@ def energy_Z(s):
     """
     return(N_e, E_e, E_p)
 
-
-# graphs for all inner-shells
+"""
+# graphs for all inner shells
 for I in range(1, 8):
     A= energy_Z(I)
+"""
 
