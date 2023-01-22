@@ -56,7 +56,9 @@ def energy_st(Z, s):
                     N_p[st] += tab[Z_idx[0]+st_idx[ST], 5]
     
     st_tab = np.arange(1, 27)
-    multiplicator = 10
+    
+    # multiplicator for the photon energy if needed (because it is much lower than the electron energy)
+    multiplicator = 1
     E_p = [i*multiplicator for i in E_p]
     
     fig, ax = plt.subplots()
@@ -96,9 +98,33 @@ def energy_Z(s):
             N_p = np.append(N_p, tab[Z_idx[0]+st_idx[0]+s_idx[0], 5])
     
     Z_tab = np.arange(4, 31)
-    multiplicator = 10000
+    multiplicator = 1
     E_p = [i*multiplicator for i in E_p]
     
+    
+    # Energy distribution
+    plt.figure()
+    plt.plot(Z_tab, E_e , drawstyle = 'steps', color = "tab:orange", label = "electrons")
+    plt.plot(Z_tab, E_p, '--', drawstyle='steps', color='tab:orange', label="photons")
+    plt.title("Neutral atoms with a "+gap+"-shell gap")
+    plt.legend()
+    plt.ylabel("Mean energy (eV)")
+    plt.xlabel("Atomic number")
+    plt.savefig("mean_energy_"+gap+"-shell.png")
+    
+    # Number distribution
+    plt.figure()
+    plt.plot(Z_tab, N_e , drawstyle = 'steps', color = "tab:blue", label = "electrons")
+    plt.plot(Z_tab, N_p, '--', drawstyle='steps', color='tab:blue', label="photons")
+    plt.title("Neutral atoms with a "+gap+"-shell gap")
+    plt.legend()
+    plt.ylabel("Number of electrons/ photons")
+    plt.xlabel("Atomic number")
+    plt.savefig("mean_number_"+gap+"-shell.png")
+    
+    
+    #Both distributions on the same graph (two axis)
+    """
     fig, ax = plt.subplots()
     ax2 = ax.twinx()
     ax2.plot(Z_tab, N_e, drawstyle="steps", color='tab:orange', label="number of electrons")
@@ -111,15 +137,11 @@ def energy_Z(s):
     ax.set_xlabel("Atomic number")
     ax.legend(loc="lower right")
     ax2.legend()
-    plt.savefig("avg_photon_e_"+gap+"-shell.png")
+    """
     return(N_e, E_e, E_p)
 
 
-
-#A = energy_st(17, 2)
-
-"""
+# graphs for all inner-shells
 for I in range(1, 8):
-    energy_Z(I)
-"""
+    A= energy_Z(I)
 

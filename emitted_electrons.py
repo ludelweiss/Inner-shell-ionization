@@ -5,20 +5,27 @@ Created on Sat Nov  5 17:54:15 2022
 
 @author: Ludmilla Allard
 
-Modelling of the average number of electrons emitted during an inner-shell ionisation of an element (Z = 4-30).
-
-The function electrons(Z, st, s) plots the graph of the probability distribution of the number of electrons emitted for a given element, ionisation stage and initial vacany position.
-The function all_electrons(S) plots the average number of emitted electrons in function of the atomic number for different shell vacancy.
-The function fluo_yield(Z, il) plots a given fluorescence yield for all ions of an element.
-
-Tables 2 and 3 from:
+Tables 2 and 3 from Kaastra and Mewe (1993):
 https://ui.adsabs.harvard.edu/abs/1993A%26AS...97..443K/abstract
 
 Z: atomic number
 st: ionisation stage
-s: shell with the initial vacancy
-il: type of inner-shell ionisation
+s: initial inner-shell vacancy
+il: type of fluorescence transition
 w: fluorescence yield
+
+Recap of all functions:
+
+correspondence(Z, st, s, il): used to give the details of each ionisation in the graph legend/ title
+Z_st_s_idx(table, Z, st, s): returns indexes of Z, st and s for chosen table
+
+electrons(Z, st, s): number distribution of emitted electrons for a given element, ionisation stage and initial inner-shell vacancy.
+all_electrons(S): mean number distribution of emitted electrons for all neutral atoms and a given inner shell.
+fluo_yield(Z, il): fluorescence yield for all ions of an element.
+energy(Z, s): energy distribution (ionisation and Auger electron) for all ions of a given element and inner shell.
+energy_st(Z, s): energy per number of electrons for a given ionisation stage of an element and a given inner shell.
+all_fluo_yield(st, il): fluorescence yield for all enutral atoms for a given fluorescence transition.
+avg_photon(Z, st, s): was used to obtain the table with the mean number of electrons and the mean number and photons energy
 """
 
 import numpy as np
@@ -106,7 +113,7 @@ def all_electrons(S) :  # the only variable is the intial shell vacancy. Three c
                 average += proba[i]*(i+1)
         Z_elec = np.append(Z_elec, average)
     electrons_nb = np.append(electrons_nb, Z_elec)/10000    # divided by 10000
-
+    
     # Plotting the graph
     #plt.figure()
     gap = correspondence(0, 0, S, 0)[2]    # the only relevant data is the gap type
@@ -315,71 +322,11 @@ def all_fluo_yield(st, il):  # if il is an array, the fluorescence yields will b
     #plt.savefig("fluorescence_yield" + il_name + ".png")
     return(w)
 
-"""
-# ORIGINAL function /!\
-def avg_photon(Z, st, s):
-    Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
-    Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
-    #print("Z", Z_idx,"st", st_idx,"s", s_idx,"Z2", Z_idx2,"st2", st_idx2,"s2", s_idx2)
-    avg_N = 0
-    avg_E = 0
-    
-    # Calculating the average number of Auger electron emitted N_e
-    if len(s_idx2) > 1:
-        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 6:]/10000
-        E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0]:Z_idx2[len(s_idx2)-1]+1, 4]
-    elif (len(s_idx2) == 1):
-        proba = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 6:]/10000
-        E_e = table[Z_idx2[0]+st_idx2[0]+s_idx2[0], 4]
-    else:
-        return([])
-    
-    N_e = 0
-    for n in range(len(proba)):
-        N_e += proba[n]*n    # n instead of n+1 to remove the photo-electron (1-10 electrons -> 0-9 Auger electrons)
-    
-    # Calculating the average photon number avg_N and the average photon energy avg_E
-    MAX = int(max(fluo_tab[:, 3]))
-    for delta in range(MAX+1):
-        if len(s_idx) > 1:
-            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]:Z_idx[0]+st_idx[0]+s_idx[len(s_idx)-1]+1, 3] == delta)
-        elif (len(s_idx) == 1):
-            D_idx = np.where(fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0], 3] == delta)
-        else:
-            return([])
-        
-        D_idx = D_idx[0]
-        if len(D_idx)>1:
-            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),6]
-            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]:Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0]+len(D_idx),5]
-        elif len(D_idx)==1:
-            w = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 6]
-            E_p_all = fluo_tab[Z_idx[0]+st_idx[0]+s_idx[0]+D_idx[0], 5]
-        else:
-            w = []
-            E_p_all = []
-        
-        N_p = np.zeros(MAX+1)     # number of emitted photons
-        E_p = np.zeros(MAX+1)
-        if type(w)==np.float64:
-            N_p[delta] += w
-            E_p[delta] += E_p_all*w
-        else:
-            for il in range(len(w)):
-                N_p[delta] += w[il]
-                E_p[delta] += E_p_all[il]*w[il]
-        avg_N+=proba[delta]*N_p[delta]
-        avg_E+=proba[delta]*E_p[delta]
-    
-    return(Z, st, s, N_e, E_e, avg_N, avg_E)
-"""
 
-# new test function:
-def avg_photon2(Z, st, s):
+def avg_photon(Z, st, s):
     if Z>4:
         Z_idx, st_idx, s_idx = Z_st_s_idx(fluo_tab, Z, st, s)
     Z_idx2, st_idx2, s_idx2 = Z_st_s_idx(table, Z, st, s)
-    #print("Z", Z_idx,"st", st_idx,"s", s_idx,"Z2", Z_idx2,"st2", st_idx2,"s2", s_idx2)
     avg_N = 0
     avg_E = 0
     
@@ -434,6 +381,9 @@ def avg_photon2(Z, st, s):
         avg_N+=proba[delta]*N_p[delta]
         avg_E+=proba[delta]*E_p[delta]
     return(Z, st, s, N_e, E_e, avg_N, avg_E)
+
+
+
 """
 Applications of the functions
 """
@@ -445,6 +395,7 @@ Applications of the functions
 
 # K alpha and K beta fluorescence for all ions of iron:
 #fluo_yield(26, (1, 2)), fluo_yield(26, (3, 4))
+
 
 # All fluorescence yields of neutral elements:
 """
@@ -475,7 +426,6 @@ all_fluo_yield(st, (16,17)), all_fluo_yield(st, 18), all_fluo_yield(st, 19), all
 #avg_photon(8, 1, 1)
 
 
-# Z: 5-30, st: 1-26, s:1-7
 """
 oxygen_tab = []
 for st in range(1, 5):
@@ -483,10 +433,13 @@ for st in range(1, 5):
 Q = np.reshape(oxygen_tab, (4, 7))
 """
 
+
+"""
 energy_tab = []
 for Z in range(4, 31):
     for st in range(1, 28):
         for s in range(1, 8):
             #print(Z, st, s)
-            energy_tab = np.append(energy_tab, avg_photon2(Z, st, s))
+            energy_tab = np.append(energy_tab, avg_photon(Z, st, s))
 energy_tab = np.reshape(energy_tab, (1090, 7))
+"""
